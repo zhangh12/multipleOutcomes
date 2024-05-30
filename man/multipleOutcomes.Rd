@@ -8,10 +8,10 @@ Covariance}
 multipleOutcomes(..., family, data, data_index = NULL, score_epsilon = 1e-06)
 }
 \arguments{
-\item{...}{formulas of models to be fitted.}
+\item{...}{formulas of models to be fitted, or moment functions for gmm.}
 
 \item{family}{a character vector of families to be used in the models.
-Currently only \code{gaussian}, \code{binomial} and \code{coxph} are supported.
+Currently only \code{gaussian}, \code{binomial}, \code{coxph} and \code{gmm} are supported.
 \code{long} for longitudinal data may be supported in the future.
 \code{family} can be of length 1 if all models are fitted in the
 same family; otherwise family should be specified for each of the models in \code{...}.}

@@ -1,5 +1,5 @@
 #' Prognostic Variables Assisted Treatment Effect Detection
-#'
+#' 
 #' @param ... x
 #' @param family x
 #' @param data x
@@ -42,7 +42,7 @@ pated <- function(..., family, data){
   )
 
   pvalue <- pchisq((estimate / stderr)^2, df = 1, lower.tail = FALSE)
-
+  
   treatment <-
     data.frame(
       term = fml$outcome[1],
@@ -63,8 +63,8 @@ pated <- function(..., family, data){
       corr = cov2cor(mcov)[id, id1]
     )
 
-  ret <- rbind(treatment, nonconfounder) %>%
-    mutate(method = paste0(method, ifelse(method == 'Prognostic' & pvalue < .05, '*', '')))
+  ret <- rbind(treatment, nonconfounder)
+  ret$method <- paste0(ret$method, ifelse(ret$method == 'Prognostic' & ret$pvalue < .05, '*', ''))
   attr(ret, 'Rel. Eff.') <- mcov[id1, id1] / stderr^2
   ret
 

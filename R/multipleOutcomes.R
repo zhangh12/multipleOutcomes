@@ -1,10 +1,11 @@
 #' Fitting Regression Models for Multiple Outcomes and Returning the Matrix of
 #' Covariance
 #' @importFrom stats coef cov fitted formula glm model.frame model.matrix pchisq
-#' printCoefmat resid
-#' @importFrom dplyr %>%
+#' printCoefmat resid vcov cov2cor
+#' @importFrom momentfit gmm4
+#' @importFrom stringr str_glue
+#' @importFrom dplyr %>% mutate
 #' @importFrom survival coxph coxph.detail
-#' @importFrom stats vcov
 #'
 #' @param ... formulas of models to be fitted, or moment functions for gmm. 
 #' @param family a character vector of families to be used in the models.
