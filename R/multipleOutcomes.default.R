@@ -1,32 +1,12 @@
 #' @export
 multipleOutcomes.default <- function(..., family, data, data_index = NULL, score_epsilon = 1e-6){
 
-  formulas <- list(...)
-  formulas[sapply(formulas, function(x){!inherits(x, 'formula')})] <- NULL
-
-  stopifnot(all(family %in% c('gaussian', 'binomial', 'coxph')))
-
-  if(length(family) == 1){
-    family <- rep(family, length(formulas))
-  }
-
-  if(is.data.frame(data)){
-    data <- list(data)
-  }
-
-  if(is.null(data_index)){
-    if(length(data) == 1){
-      data_index <- rep(1, length(formulas))
-    }else{
-      stop('data_index should be a integer vector of length ', length(formula))
-    }
-  }
-  stopifnot(all(sapply(data, is.data.frame)))
-
-  stopifnot(all(sapply(data_index, function(x){abs(x - round(x)) < .Machine$double.eps^0.5})))
-  stopifnot(all(data_index <= length(data) & data_index >= 1))
-  stopifnot(length(data_index) == length(formulas))
-
+  input <- checkInput(..., family = family, data = data, data_index = data_index)
+  formulas <- input$formulas
+  family <- input$family
+  data <- input$data
+  data_index <- input$data_index
+  
   inverseHessianMatrixGlm <- function(family, design_matrix, model = NULL){
     n_sam <- nrow(design_matrix)
     n_par <- ncol(design_matrix)
@@ -42,7 +22,20 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
 
     invisible(ret)
   }
-
+  
+  inverseJacobianMatrixGmm <- function(func, u, data){
+    func2 <- function(eval_at, data){
+      apply(func(eval_at, data), 2, sum)
+    }
+    
+    n_sam <- nrow(data)
+    jac <- numDeriv::jacobian(func2, u, data = data) / n_sam
+    ret <- solve(jac)
+    attr(ret, 'n') <- n_sam
+    
+    invisible(ret)
+  }
+  
   IDMapping <- function(df, i, var_name = NULL){
     if(i == 1){
       ids <- 1:df[1]
@@ -67,15 +60,27 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
   vars <- vector('list', n_models)
 
   for(i in 1:n_models){
+    
     if(family[i] %in% c('binomial', 'gaussian')){
       models[[i]] <- glm(formulas[[i]], family[i], data[[data_index[i]]])
-    }else{ # coxph
-      models[[i]] <- coxph(formulas[[i]], data[[data_index[i]]], model = TRUE)
+    }else{
+      if(family[i] %in% 'coxph'){
+        models[[i]] <- coxph(formulas[[i]], data[[data_index[i]]], model = TRUE)
+      }else{ # gmm
+        models[[i]] <- gmm4(formulas[[i]], data[[data_index[i]]], theta0 = eval(formals(formulas[[i]])$start))
+        attr(models[[i]], 'score') <- formulas[[i]](models[[i]]@theta, data[[data_index[i]]])
+      }
+    }
+    
+    if(family[i] %in% 'gmm'){
+      cf <- models[[i]]@theta
+    }else{
+      cf <- coef(models[[i]])
     }
 
-    df[i] <- coef(models[[i]]) %>% length
-    bet <- c(bet, coef(models[[i]]) %>% unname)
-    vars[[i]] <- coef(models[[i]]) %>% names
+    df[i] <- length(cf)
+    bet <- c(bet, unname(cf))
+    vars[[i]] <- names(cf)
   }
 
   n_par <- length(bet)
@@ -91,13 +96,18 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
       score1 <- resid(models[[i]], type = 'response') * dm1
       inv_hess[[i]] <- inverseHessianMatrixGlm(family[i], dm1, models[[i]])
       rm(dm1)
-    }else{ # coxph
-      score1 <- -as.matrix(resid(models[[i]], type = 'score'))
-      imat <- coxph.detail(models[[i]])$imat
-      if('numeric' %in% class(imat)){
-        inv_hess[[i]] <- solve(sum(imat) / nrow(score1))
-      }else{
-        inv_hess[[i]] <- solve(rowSums(imat, dims = 2) / nrow(score1))
+    }else{
+      if(family[i] %in% 'coxph'){
+        score1 <- -as.matrix(resid(models[[i]], type = 'score'))
+        imat <- coxph.detail(models[[i]])$imat
+        if('numeric' %in% class(imat)){
+          inv_hess[[i]] <- solve(sum(imat) / nrow(score1))
+        }else{
+          inv_hess[[i]] <- solve(rowSums(imat, dims = 2) / nrow(score1))
+        }
+      }else{ # gmm
+        score1 <- attr(models[[i]], 'score')
+        inv_hess[[i]] <- inverseJacobianMatrixGmm(formulas[[i]], models[[i]]@theta, data[[data_index[i]]])
       }
     }
 
@@ -116,15 +126,20 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
           inv_hess[[j]] <- inverseHessianMatrixGlm(family[j], dm2, models[[j]])
         }
         rm(dm2)
-      }else{ # coxph
-        score2 <- -as.matrix(resid(models[[j]], type = 'score'))
-        if(is.null(inv_hess[[j]])){
-          imat <- coxph.detail(models[[j]])$imat
-          if('numeric' %in% class(imat)){
-            inv_hess[[j]] <- solve(sum(imat) / nrow(score2))
-          }else{
-            inv_hess[[j]] <- solve(rowSums(imat, dims = 2) / nrow(score2))
+      }else{
+        if(family[i] %in% 'coxph'){
+          score2 <- -as.matrix(resid(models[[j]], type = 'score'))
+          if(is.null(inv_hess[[j]])){
+            imat <- coxph.detail(models[[j]])$imat
+            if('numeric' %in% class(imat)){
+              inv_hess[[j]] <- solve(sum(imat) / nrow(score2))
+            }else{
+              inv_hess[[j]] <- solve(rowSums(imat, dims = 2) / nrow(score2))
+            }
           }
+        }else{ # gmm
+          score2 <- attr(models[[j]], 'score')
+          inv_hess[[j]] <- inverseJacobianMatrixGmm(formulas[[j]], models[[j]]@theta, data[[data_index[j]]])
         }
       }
 
@@ -135,7 +150,7 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
       mcov[id1, id2] <-
         inv_hess[[i]] %*%
         info %*%
-        inv_hess[[j]] *
+        t(inv_hess[[j]]) *
         (attr(info, 'n') / nrow(score1) / nrow(score2))
       mcov[id2, id1] <- t(mcov[id1, id2])
 

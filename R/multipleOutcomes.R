@@ -6,9 +6,9 @@
 #' @importFrom survival coxph coxph.detail
 #' @importFrom stats vcov
 #'
-#' @param ... formulas of models to be fitted.
+#' @param ... formulas of models to be fitted, or moment functions for gmm. 
 #' @param family a character vector of families to be used in the models.
-#' Currently only `gaussian`, `binomial` and `coxph` are supported.
+#' Currently only `gaussian`, `binomial`, `coxph` and `gmm` are supported.
 #' `long` for longitudinal data may be supported in the future.
 #' `family` can be of length 1 if all models are fitted in the
 #' same family; otherwise family should be specified for each of the models in `...`.
