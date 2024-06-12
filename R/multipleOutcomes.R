@@ -1,5 +1,10 @@
 #' Fitting Regression Models for Multiple Outcomes and Returning the Matrix of
 #' Covariance
+#' @description
+#' `multipleOutcomes` can fit different types of models for multiple outcomes 
+#' simultaneously and return model parameters and variance-covariance matrix 
+#' for further analysis. 
+#' 
 #' @importFrom stats coef cov fitted formula glm model.frame model.matrix pchisq
 #' printCoefmat resid vcov cov2cor
 #' @importFrom momentfit gmm4
@@ -9,10 +14,17 @@
 #'
 #' @param ... formulas of models to be fitted, or moment functions for gmm. 
 #' @param family a character vector of families to be used in the models.
-#' Currently only `gaussian`, `binomial`, `coxph` and `gmm` are supported.
-#' `long` for longitudinal data may be supported in the future.
+#' Currently only `gaussian`, `binomial`, `coxph` and `gmm` are supported. 
+#' To analyze longitudinal data and repeated measurements, `family` should be 
+#' something like `gee+id+family+corstr`, 
+#' where id is the column name defining cluster (i.e. one patient per cluster). 
+#' The covariance estimate may be inaccurate if number of clusters is too small.  
+#' The supported families include `gaussian`, `binomial`, 
+#' `poisson`, `Gamma`, and `quasi`. The supported correlation structures include 
+#' `independence`, `stat_M_dep`, `non_stat_M_dep`, `exchangeable`, `AR-M` 
+#' and `unstructured`. So a valid family string is like `gee+user_id+binomial+exchangeable`. 
 #' `family` can be of length 1 if all models are fitted in the
-#' same family; otherwise family should be specified for each of the models in `...`.
+#' same family; otherwise family should be specified for each of the models.
 #' @param data a data frame if all models are fitted on the same dataset;
 #' otherwise a list of data frames for fitting models in `...`. Note that a
 #' dataset can be used to fit multiple models, thus, `length(data)` is unnecessary

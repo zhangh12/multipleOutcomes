@@ -66,9 +66,19 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
     }else{
       if(family[i] %in% 'coxph'){
         models[[i]] <- coxph(formulas[[i]], data[[data_index[i]]], model = TRUE)
-      }else{ # gmm
-        models[[i]] <- gmm4(formulas[[i]], data[[data_index[i]]], theta0 = eval(formals(formulas[[i]])$start))
-        attr(models[[i]], 'score') <- formulas[[i]](models[[i]]@theta, data[[data_index[i]]])
+      }else{
+        if(family[i] %in% 'gmm'){
+          models[[i]] <- gmm4(formulas[[i]], data[[data_index[i]]], theta0 = eval(formals(formulas[[i]])$start))
+          attr(models[[i]], 'score') <- formulas[[i]](models[[i]]@theta, data[[data_index[i]]])
+        }else{ ## gee+id+family+corstr
+          config <- parseGeeConfig(family[i])
+          suppressMessages(
+            capture.output(
+              models[[i]] <- gee(formulas[[i]], id = id, data = data[[data_index[i]]], family = config$family, corstr = config$corstr), 
+              file = NULL
+            )
+          )
+        }
       }
     }
     
@@ -105,9 +115,14 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
         }else{
           inv_hess[[i]] <- solve(rowSums(imat, dims = 2) / nrow(score1))
         }
-      }else{ # gmm
-        score1 <- attr(models[[i]], 'score')
-        inv_hess[[i]] <- inverseJacobianMatrixGmm(formulas[[i]], models[[i]]@theta, data[[data_index[i]]])
+      }else{
+        if(family[i] %in% 'gmm'){
+          score1 <- attr(models[[i]], 'score')
+          inv_hess[[i]] <- inverseJacobianMatrixGmm(formulas[[i]], models[[i]]@theta, data[[data_index[i]]])
+        }else{ ## gee+id+family
+          score1 <- models[[i]]$score
+          rownames(score1) <- 1:nrow(score1)
+        }
       }
     }
 
@@ -115,7 +130,7 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
 
     id1 <- IDMapping(df, i, vars[[i]])
     id_map[[i]] <- id1
-    for(j in i:length(formulas)){
+    for(j in i:n_models){
       n_shared_sample_sizes[i, j] <- intersect(rownames(data[[data_index[[i]]]]), rownames(data[[data_index[[j]]]])) %>% length()
       n_shared_sample_sizes[j, i] <- n_shared_sample_sizes[i, j]
 
@@ -127,7 +142,7 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
         }
         rm(dm2)
       }else{
-        if(family[i] %in% 'coxph'){
+        if(family[j] %in% 'coxph'){
           score2 <- -as.matrix(resid(models[[j]], type = 'score'))
           if(is.null(inv_hess[[j]])){
             imat <- coxph.detail(models[[j]])$imat
@@ -137,9 +152,15 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
               inv_hess[[j]] <- solve(rowSums(imat, dims = 2) / nrow(score2))
             }
           }
-        }else{ # gmm
-          score2 <- attr(models[[j]], 'score')
-          inv_hess[[j]] <- inverseJacobianMatrixGmm(formulas[[j]], models[[j]]@theta, data[[data_index[j]]])
+        }else{
+          if(family[j] %in% 'gmm'){
+            score2 <- attr(models[[j]], 'score')
+            inv_hess[[j]] <- inverseJacobianMatrixGmm(formulas[[j]], models[[j]]@theta, data[[data_index[j]]])
+          }else{  ## gee+id+family+corstr
+            score2 <- models[[j]]$score
+            rownames(score2) <- 1:nrow(score2)
+            inv_hess[[j]] <- solve(-models[[j]]$hess / nrow(score2))
+          }
         }
       }
 

@@ -12,9 +12,16 @@ multipleOutcomes(..., family, data, data_index = NULL, score_epsilon = 1e-06)
 
 \item{family}{a character vector of families to be used in the models.
 Currently only \code{gaussian}, \code{binomial}, \code{coxph} and \code{gmm} are supported.
-\code{long} for longitudinal data may be supported in the future.
+To analyze longitudinal data and repeated measurements, \code{family} should be
+something like \code{gee+id+family+corstr},
+where id is the column name defining cluster (i.e. one patient per cluster).
+The covariance estimate may be inaccurate if number of clusters is too small.
+The supported families include \code{gaussian}, \code{binomial},
+\code{poisson}, \code{Gamma}, and \code{quasi}. The supported correlation structures include
+\code{independence}, \code{stat_M_dep}, \code{non_stat_M_dep}, \code{exchangeable}, \code{AR-M}
+and \code{unstructured}. So a valid family string is like \code{gee+user_id+binomial+exchangeable}.
 \code{family} can be of length 1 if all models are fitted in the
-same family; otherwise family should be specified for each of the models in \code{...}.}
+same family; otherwise family should be specified for each of the models.}
 
 \item{data}{a data frame if all models are fitted on the same dataset;
 otherwise a list of data frames for fitting models in \code{...}. Note that a
@@ -49,8 +56,9 @@ being used to fit the models. \cr
 }
 }
 \description{
-Fitting Regression Models for Multiple Outcomes and Returning the Matrix of
-Covariance
+\code{multipleOutcomes} can fit different types of models for multiple outcomes
+simultaneously and return model parameters and variance-covariance matrix
+for further analysis.
 }
 \examples{
 ## More examples can be found in the vignettes.

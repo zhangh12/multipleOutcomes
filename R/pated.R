@@ -1,14 +1,30 @@
 #' Prognostic Variables Assisted Treatment Effect Detection
+#' @description
+#' `pated` is a wrapper function of `multipleOutcomes` for testing treatment effect 
+#' in randomized clinical trials. It assumes that prognostic variables are fully 
+#' randomized. This assumption can help enhancing statistical power of conventional 
+#' approaches in detecting the treatment effect. Specifically, the sensitivity 
+#' of the conventional models specified in `...` are improved by `pated`. 
 #' 
-#' @param ... x
-#' @param family x
-#' @param data x
+#' @param ... formulas of models to be fitted, or moment functions for gmm. 
+#' @param family a character vector of families to be used in the models.
+#' Currently only `gaussian`, `binomial`, `coxph` and `gmm` are supported.
+#' `long` for longitudinal data may be supported in the future.
+#' `family` can be of length 1 if all models are fitted in thesame family; 
+#' otherwise family should be specified for each of the models in `...`.
+#' @param data a data frame if all models are fitted on the same dataset;
+#' otherwise a list of data frames for fitting models in `...`. Note that a
+#' dataset can be used to fit multiple models, thus, `length(data)` is unnecessary
+#' to be equal to the number of models in `...`. The row names in a data frame
+#' are treated as sample IDs. Consequently, for any two records in different
+#' data frames that correspond to the same sample, their row names should be
+#' consistent.
 #'
-#' @return x
+#' @return a data frame of testing results.
 #' @export
 #'
 #' @examples
-#' # x
+#' # see vignettes
 pated <- function(..., family, data){
   fit <- multipleOutcomes(..., family = family, data = data, data_index = NULL)
 

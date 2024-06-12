@@ -14,8 +14,17 @@ checkInput <- function(..., family, data, data_index){
     }
   }
   
-  if(!all(family %in% c('gaussian', 'binomial', 'coxph', 'gmm'))){
-    stop('Only gaussian, binomial, coxph, and gmm are supported families.')
+  for(i in seq_along(family)){
+    if(family[i] %in% c('gaussian', 'binomial', 'coxph', 'gmm')){
+      next
+    }
+    
+    config <- parseGeeConfig(family[i])
+    if(is.null(config)){
+      stop(str_glue('{family[i]} is not a valid family. Only gaussian, binomial, coxph, gmm, and "gee+id+family+corstr" are supported'))
+    }
+    
+    family[i] <- config$family_str
   }
   
   if(length(family) == 1){

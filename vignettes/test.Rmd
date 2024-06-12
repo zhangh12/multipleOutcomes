@@ -130,7 +130,7 @@ printObject(JM_aids.id)
 ```
 
 ```{r echo=FALSE}
-data(actg, package = 'mlr3proba')
+data(actg, package = 'multipleOutcomes')
 
 mlr3proba_actg <- 
   pated(
@@ -174,7 +174,7 @@ joint.Cox_dataOvarian1 <-
     TEAD1 ~ grp,
     TIMP2 ~ grp,
     YWHAB ~ grp,
-    family = c('coxph', rep('gaussian', 14)),
+    family = c('coxph', rep('gaussian', 6)),
     data = rbind(ctrl, trt)
   )
 
