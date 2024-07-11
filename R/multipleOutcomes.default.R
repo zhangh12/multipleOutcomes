@@ -7,6 +7,31 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
   data <- input$data
   data_index <- input$data_index
   
+  matrixSquareRoot <- function(mat){
+    ei <- eigen(mat)
+    v <- ei$vectors
+    d <- diag(sqrt(ei$values), nrow(v), ncol(v))
+    v %*% d %*% t(v)
+  }
+  
+  # for HR in coxph, use mean = TRUE
+  # for logrank, use mean = FALSE
+  imatCoxph <- function(model, mean = TRUE){
+    imat <- coxph.detail(model)$imat
+    n <- nrow(matrix(resid(model, type = 'score')))
+    if('numeric' %in% class(imat)){
+      imat <- sum(imat) / n
+    }else{
+      n <- nrow(resid(model, type = 'score'))
+      imat <- rowSums(imat, dims = 2) / n
+    }
+    if(!mean){
+      imat <- imat * n
+    }
+    
+    imat
+  }
+  
   inverseHessianMatrixGlm <- function(family, design_matrix, model = NULL){
     n_sam <- nrow(design_matrix)
     n_par <- ncol(design_matrix)
@@ -55,10 +80,10 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
   n_models <- length(formulas)
   models <- vector('list', n_models)
   inv_hess <- vector('list', n_models)
+
   df <- rep(NA, n_models)
   bet <- NULL
   vars <- vector('list', n_models)
-
   for(i in 1:n_models){
     
     if(family[i] %in% c('binomial', 'gaussian')){
@@ -67,21 +92,31 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
       if(family[i] %in% 'coxph'){
         models[[i]] <- coxph(formulas[[i]], data[[data_index[i]]], model = TRUE)
       }else{
-        if(family[i] %in% 'gmm'){
-          models[[i]] <- gmm4(formulas[[i]], data[[data_index[i]]], theta0 = eval(formals(formulas[[i]])$start))
-          attr(models[[i]], 'score') <- formulas[[i]](models[[i]]@theta, data[[data_index[i]]])
-        }else{ ## gee+id+family+corstr
-          config <- parseGeeConfig(family[i])
-          if(!(config$id %in% names(data[[data_index[i]]]))){
-            stop(str_glue('{config$id} is not in data[[{data_index[i]}]]'))
-          }
-          data[[data_index[i]]]$gee_id <- data[[data_index[i]]][, config$id]
-          suppressMessages(
-            capture.output(
-              models[[i]] <- gee(formulas[[i]], id = 'gee_id', data = data[[data_index[i]]], family = config$family, corstr = config$corstr), 
-              file = NULL
+        if(family[i] %in% 'logrank'){
+          models[[i]] <- coxph(formulas[[i]], data[[data_index[i]]], model = TRUE, iter = 0)
+          tmp_score <- as.matrix(resid(models[[i]], type = 'score'))
+          tmp_imat <- imatCoxph(models[[i]], mean = FALSE)
+          theta <- solve(matrixSquareRoot(tmp_imat), colSums(tmp_score))
+          names(theta) <- names(coef(models[[i]]))
+          attr(models[[i]], 'theta') <- theta
+          rm(theta, tmp_imat, tmp_score)
+        }else{
+          if(family[i] %in% 'gmm'){
+            models[[i]] <- gmm4(formulas[[i]], data[[data_index[i]]], theta0 = eval(formals(formulas[[i]])$start))
+            attr(models[[i]], 'score') <- formulas[[i]](models[[i]]@theta, data[[data_index[i]]])
+          }else{ ## gee+id+family+corstr
+            config <- parseGeeConfig(family[i])
+            if(!(config$id %in% names(data[[data_index[i]]]))){
+              stop(str_glue('{config$id} is not in data[[{data_index[i]}]]'))
+            }
+            data[[data_index[i]]]$gee_id <- data[[data_index[i]]][, config$id]
+            suppressMessages(
+              capture.output(
+                models[[i]] <- gee(formulas[[i]], id = gee_id, data = data[[data_index[i]]], family = config$family, corstr = config$corstr), 
+                file = NULL
+              )
             )
-          )
+          }
         }
       }
     }
@@ -89,9 +124,13 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
     if(family[i] %in% 'gmm'){
       cf <- models[[i]]@theta
     }else{
-      cf <- coef(models[[i]])
+      if(family[i] %in% 'logrank'){
+        cf <- attr(models[[i]], 'theta')
+      }else{
+        cf <- coef(models[[i]])
+      }
     }
-
+    
     df[i] <- length(cf)
     bet <- c(bet, unname(cf))
     vars[[i]] <- names(cf)
@@ -101,7 +140,7 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
   mcov <- matrix(0, n_par, n_par)
   n_shared_sample_sizes <- matrix(0, n_models, n_models)
   id_map <- NULL
-
+  
   for(i in 1:n_models){
     n_shared_sample_sizes[i, i] <- nrow(data[[data_index[i]]])
 
@@ -111,13 +150,13 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
       inv_hess[[i]] <- inverseHessianMatrixGlm(family[i], dm1, models[[i]])
       rm(dm1)
     }else{
-      if(family[i] %in% 'coxph'){
+      if(family[i] %in% c('coxph', 'logrank')){
         score1 <- -as.matrix(resid(models[[i]], type = 'score'))
-        imat <- coxph.detail(models[[i]])$imat
-        if('numeric' %in% class(imat)){
-          inv_hess[[i]] <- solve(sum(imat) / nrow(score1))
+        if(family[i] %in% 'coxph'){
+          inv_hess[[i]] <- solve(imatCoxph(models[[i]]))
         }else{
-          inv_hess[[i]] <- solve(rowSums(imat, dims = 2) / nrow(score1))
+          tmp_imat <- imatCoxph(models[[i]], mean = FALSE)
+          inv_hess[[i]] <- solve(matrixSquareRoot(tmp_imat)) * nrow(score1)
         }
       }else{
         if(family[i] %in% 'gmm'){
@@ -126,11 +165,14 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
         }else{ ## gee+id+family
           score1 <- models[[i]]$score
           rownames(score1) <- 1:nrow(score1)
+          inv_hess[[i]] <- solve(-models[[i]]$hess / nrow(score1))
         }
       }
     }
 
-    stopifnot((colSums(score1) / nrow(score1)) %>% abs %>% max < score_epsilon)
+    if(!(family[i] %in% 'logrank')){
+      stopifnot((colSums(score1) / nrow(score1)) %>% abs %>% max < score_epsilon)
+    }
 
     id1 <- IDMapping(df, i, vars[[i]])
     id_map[[i]] <- id1
@@ -146,15 +188,13 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
         }
         rm(dm2)
       }else{
-        if(family[j] %in% 'coxph'){
+        if(family[j] %in% c('coxph', 'logrank')){
           score2 <- -as.matrix(resid(models[[j]], type = 'score'))
-          if(is.null(inv_hess[[j]])){
-            imat <- coxph.detail(models[[j]])$imat
-            if('numeric' %in% class(imat)){
-              inv_hess[[j]] <- solve(sum(imat) / nrow(score2))
-            }else{
-              inv_hess[[j]] <- solve(rowSums(imat, dims = 2) / nrow(score2))
-            }
+          if(family[j] %in% 'coxph'){
+            inv_hess[[j]] <- solve(imatCoxph(models[[j]]))
+          }else{
+            tmp_imat <- imatCoxph(models[[j]], mean = FALSE)
+            inv_hess[[j]] <- solve(matrixSquareRoot(tmp_imat)) * nrow(score2)
           }
         }else{
           if(family[j] %in% 'gmm'){
@@ -168,7 +208,9 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
         }
       }
 
-      stopifnot((colSums(score2) / nrow(score2)) %>% abs %>% max < score_epsilon)
+      if(!(family[j] %in% 'logrank')){
+        stopifnot((colSums(score2) / nrow(score2)) %>% abs %>% max < score_epsilon)
+      }
 
       id2 <- IDMapping(df, j)
       info <- FisherInformation(score1, score2)
@@ -181,6 +223,7 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
 
       rm(score2)
     }
+    rm(score1)
 
     models[i] <- list(NULL)
     inv_hess[i] <- list(NULL)
@@ -192,6 +235,7 @@ multipleOutcomes.default <- function(..., family, data, data_index = NULL, score
       coefficients = bet,
       mcov = mcov,
       id_map = id_map,
+      family = family,
       n_shared_sample_sizes = n_shared_sample_sizes
     )
 

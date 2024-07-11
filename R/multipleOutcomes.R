@@ -14,12 +14,12 @@
 #'
 #' @param ... formulas of models to be fitted, or moment functions for gmm. 
 #' @param family a character vector of families to be used in the models.
-#' Currently only `gaussian`, `binomial`, `coxph` and `gmm` are supported. 
+#' Currently only `gaussian`, `binomial`, `coxph`, `gmm` and `gee` are supported. 
 #' To analyze longitudinal data and repeated measurements, `family` should be 
 #' something like `gee+id+family+corstr`, 
 #' where id is the column name defining cluster (i.e. one patient per cluster). 
 #' The covariance estimate may be inaccurate if number of clusters is too small.  
-#' The supported families include `gaussian`, `binomial`, 
+#' The supported families for `gee` include `gaussian`, `binomial`, 
 #' `poisson`, `Gamma`, and `quasi`. The supported correlation structures include 
 #' `independence`, `stat_M_dep`, `non_stat_M_dep`, `exchangeable`, `AR-M` 
 #' and `unstructured`. So a valid family string is like `gee+user_id+binomial+exchangeable`. 

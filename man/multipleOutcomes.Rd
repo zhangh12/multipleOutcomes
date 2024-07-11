@@ -11,12 +11,12 @@ multipleOutcomes(..., family, data, data_index = NULL, score_epsilon = 1e-06)
 \item{...}{formulas of models to be fitted, or moment functions for gmm.}
 
 \item{family}{a character vector of families to be used in the models.
-Currently only \code{gaussian}, \code{binomial}, \code{coxph} and \code{gmm} are supported.
+Currently only \code{gaussian}, \code{binomial}, \code{coxph}, \code{gmm} and \code{gee} are supported.
 To analyze longitudinal data and repeated measurements, \code{family} should be
 something like \code{gee+id+family+corstr},
 where id is the column name defining cluster (i.e. one patient per cluster).
 The covariance estimate may be inaccurate if number of clusters is too small.
-The supported families include \code{gaussian}, \code{binomial},
+The supported families for \code{gee} include \code{gaussian}, \code{binomial},
 \code{poisson}, \code{Gamma}, and \code{quasi}. The supported correlation structures include
 \code{independence}, \code{stat_M_dep}, \code{non_stat_M_dep}, \code{exchangeable}, \code{AR-M}
 and \code{unstructured}. So a valid family string is like \code{gee+user_id+binomial+exchangeable}.

@@ -8,9 +8,8 @@
 #' 
 #' @param ... formulas of models to be fitted, or moment functions for gmm. 
 #' @param family a character vector of families to be used in the models.
-#' Currently only `gaussian`, `binomial`, `coxph` and `gmm` are supported.
-#' `long` for longitudinal data may be supported in the future.
-#' `family` can be of length 1 if all models are fitted in thesame family; 
+#' All families supported by `multipleOutcomes` are also supported by `pated`. 
+#' `family` can be of length 1 if all models are fitted in the same family; 
 #' otherwise family should be specified for each of the models in `...`.
 #' @param data a data frame if all models are fitted on the same dataset;
 #' otherwise a list of data frames for fitting models in `...`. Note that a
@@ -19,14 +18,59 @@
 #' are treated as sample IDs. Consequently, for any two records in different
 #' data frames that correspond to the same sample, their row names should be
 #' consistent.
+#' @param data_index `NULL` if `data` is a data frame; otherwise, a vector in
+#' integer specifying mapping a model in `...` to a data frame in `data` (a list).
 #'
 #' @return a data frame of testing results.
 #' @export
 #'
 #' @examples
-#' # see vignettes
-pated <- function(..., family, data){
-  fit <- multipleOutcomes(..., family = family, data = data, data_index = NULL)
+#' ## More examples can be found in the vignettes.
+#' library(survival)
+#' library(mvtnorm)
+#' library(tidyr)
+#' genData <- function(seed = NULL){
+#'
+#'   set.seed(seed)
+#'   n <- 200
+#'   sigma <- matrix(c(1, .6, .6, 1), 2)
+#'   x <- rmvnorm(n, sigma = sigma)
+#'   z1 <- rbinom(n, 1, .6)
+#'   z2 <- rnorm(n)
+#'   gam <- c(.1, -.2)
+#'   trt <- rbinom(n, 1, .5)
+#'
+#'   bet <- c(-.2,.2)
+#'   y <- -.5+x %*% bet + z1 * .3 - z2 * .1 + .1 * trt-.1 * rnorm(n)
+#'   death <- rbinom(n, 1, .8)
+#'   id <- 1:n
+#'   data.frame(
+#'     y = y, trt = trt, 
+#'     z1 = z1, z2 = z2, 
+#'     x1 = x[, 1], x2 = x[, 2], 
+#'     death, id)
+#'
+#' }
+#'
+#' dat1 <- genData(seed = 31415926)
+#' 
+#' ## create a dataset with repeated measurements x
+#' dat2 <- dat1 %>% pivot_longer(c(x1, x2), names_to='tmp', values_to='x') %>% 
+#' dplyr::select(x, trt, id) %>% as.data.frame()
+#' 
+#' fit <- 
+#'   pated(
+#'     Surv(time=y, event=death) ~ trt,
+#'     z1 ~ trt, 
+#'     z2 ~ trt, 
+#'     x ~ trt, 
+#'     family=c('logrank', 'binomial', 'gaussian', 'gee+id+gaussian'), 
+#'     data=list(dat1, dat2), data_index = c(1, 1, 1, 2))
+#' 
+#' fit
+#' 
+pated <- function(..., family, data, data_index = NULL){
+  fit <- multipleOutcomes(..., family = family, data = data, data_index = data_index)
 
   parseFormula <- function(...){
     formulas <- list(...)
@@ -62,6 +106,7 @@ pated <- function(..., family, data){
   treatment <-
     data.frame(
       term = fml$outcome[1],
+      family = 'PATED',
       estimate = estimate,
       stderr = stderr,
       pvalue = pvalue,
@@ -72,6 +117,7 @@ pated <- function(..., family, data){
   nonconfounder <-
     data.frame(
       term = fml$outcome,
+      family = family,
       estimate = coef(fit)[id],
       stderr = sqrt(diag(vcov(fit))[id]),
       pvalue = pchisq((coef(fit)[id] / sqrt(diag(vcov(fit)))[id])^2, df = 1, lower.tail = FALSE),
