@@ -14,9 +14,9 @@
 #'
 #' @param ... formulas of models to be fitted, or moment functions for gmm. 
 #' @param family a character vector of families to be used in the models.
-#' Currently only `gaussian`, `binomial`, `coxph`, `gmm` and `gee` are supported. 
-#' To analyze longitudinal data and repeated measurements, `family` should be 
-#' something like `gee+id+family+corstr`, 
+#' Currently only `gaussian`, `binomial`, `coxph`, `logrank`, `gmm` and `gee` 
+#' are supported. To analyze longitudinal data and repeated measurements, 
+#' `family` should be something like `gee+id+family+corstr`, 
 #' where id is the column name defining cluster (i.e. one patient per cluster). 
 #' The covariance estimate may be inaccurate if number of clusters is too small.  
 #' The supported families for `gee` include `gaussian`, `binomial`, 
@@ -34,6 +34,7 @@
 #' consistent.
 #' @param data_index `NULL` if `data` is a data frame; otherwise, a vector in
 #' integer specifying mapping a model in `...` to a data frame in `data` (a list).
+#' @param nboot non-zero integer if bootstrap is adopted. By default 0.
 #' @param score_epsilon whatever.
 #'
 #' @return It returns an object of class "multipleOutcomes", which is a list
@@ -110,7 +111,17 @@
 #'   ## summary of parameters in a specific model
 #'   summary(fit, 4)
 #'
-multipleOutcomes <- function(..., family, data, data_index = NULL, score_epsilon = 1e-6){
+multipleOutcomes <- 
+  function(
+    ..., 
+    data, 
+    family = NULL, 
+    data_index = NULL, 
+    nboot = 0, 
+    compute_cov = TRUE, 
+    seed = NULL,
+    score_epsilon = 1e-6
+  ){
 
   UseMethod('multipleOutcomes')
 

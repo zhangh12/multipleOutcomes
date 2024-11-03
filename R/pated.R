@@ -6,6 +6,8 @@
 #' approaches in detecting the treatment effect. Specifically, the sensitivity 
 #' of the conventional models specified in `...` are improved by `pated`. 
 #' 
+#' @importFrom stringr str_extract
+#' @importFrom ggpubr ggarrange
 #' @param ... formulas of models to be fitted, or moment functions for gmm. 
 #' @param family a character vector of families to be used in the models.
 #' All families supported by `multipleOutcomes` are also supported by `pated`. 
@@ -69,37 +71,72 @@
 #' 
 #' fit
 #' 
-pated <- function(..., family, data, data_index = NULL){
-  fit <- multipleOutcomes(..., family = family, data = data, data_index = data_index)
+pated <- 
+  function(
+    ..., 
+    data, 
+    family = NULL, 
+    data_index = NULL, 
+    nboot = 0, 
+    compute_cov = TRUE, 
+    seed = NULL, 
+    transform = 'identity'){
+    
+  fit <- 
+    multipleOutcomes(
+      ..., 
+      data = data, 
+      family = family, 
+      data_index = data_index,
+      nboot = nboot, 
+      compute_cov = compute_cov, 
+      seed = seed)
 
-  parseFormula <- function(...){
-    formulas <- list(...)
-    formulas[sapply(formulas, function(x){!inherits(x, 'formula')})] <- NULL
-    outcome <- NULL
-    arm <- NULL
-    for(fstr in formulas){
-      outcome <- c(outcome, trimws(sub("\\s*~.*", "", deparse1(fstr))))
-      arm <- c(arm, trimws(sub("^.*?~", "", deparse1(fstr))))
-    }
-    data.frame(outcome, arm)
+  if(nboot > 0){
+    fml <- parseTreatmentVariableFromCall(...)
+  }else{
+    fml <- parseTreatmentVariableFromFormula(...)
   }
 
-  fml <- parseFormula(...)
-
-  id <- sapply(1:length(fit$id_map), function(i) fit$id_map[[i]][fml$arm[i]])
-  id1 <- id[1]
-  id2 <- id[-1]
+  #id <- sapply(1:length(fit$id_map), function(i) fit$id_map[[i]][fml$arm[i]])
+  id <- 
+    lapply(
+      seq_along(fit$id_map), 
+      function(i){
+        imap <- fit$id_map[[i]]
+        arm <- fml$arm[i]
+        if(arm %in% names(imap)){
+          imap[arm]
+        }else{
+          if(any(grepl(str_glue('^{arm}_\\d+%$'), names(imap)))){
+            imap[grepl(str_glue('^{arm}_\\d+%$'), names(imap))]
+          }else{
+            imap[startsWith(str_extract(names(imap), "(?<=time_\\().*?(?=\\)_\\()"), arm)]
+          }
+        }
+      }
+    )
+  id1 <- id[[1]]
+  id2 <- unlist(id[-1])
   Delta <- coef(fit)[id1]
   delta <- coef(fit)[id2]
   mcov <- vcov(fit)
-  opt_c <- as.vector(- solve(mcov[id2, id2, drop = FALSE]) %*% mcov[id2, id1, drop = FALSE])
+  if(!is.null(mcov)){
+    mcov22 <- mcov[id2, id2, drop = FALSE]
+    mcov21 <- mcov[id2, id1, drop = FALSE]
+    var11 <- diag(mcov[id1, id1, drop = FALSE])
+  }else{
+    mcov22 <- cov(fit$bootstrap_estimate[, id2, drop = FALSE])
+    mcov21 <- cov(fit$bootstrap_estimate[, id2, drop = FALSE], fit$bootstrap_estimate[, id1, drop = FALSE])
+    var11 <- apply(fit$bootstrap_estimate[, id1, drop = FALSE], 2, var)
+    if(!('kmMO' %in% fml$func)){
+      mcov <- cov(fit$bootstrap_estimate)
+    }
+  }
+  opt_c <- - solve(mcov22) %*% mcov21
 
-  estimate <- Delta + sum(delta * opt_c)
-  stderr <- sqrt(
-    mcov[id1, id1] +
-      2 * as.vector(t(opt_c) %*% mcov[id2, id1, drop = FALSE]) +
-      as.vector(t(opt_c) %*% mcov[id2, id2, drop = FALSE] %*% opt_c)
-  )
+  estimate <- Delta + as.vector(t(opt_c) %*% delta)
+  stderr <- sqrt(var11 + diag(t(opt_c) %*% mcov21) + diag(t(mcov21) %*% opt_c) + diag(t(opt_c) %*% mcov22 %*% opt_c))
 
   pvalue <- pchisq((estimate / stderr)^2, df = 1, lower.tail = FALSE)
   
@@ -114,20 +151,63 @@ pated <- function(..., family, data, data_index = NULL){
       corr = NA
     )
 
+  if(is.null(family)){
+    family <- gsub('MO', '', fml$func)
+    family <- c(rep(family[1], length(id1)), rep(family[-1], times = fml$n_terms[-1]))
+  }
+  
   nonconfounder <-
     data.frame(
-      term = fml$outcome,
+      term = c(rep(fml$outcome[1], length(id1)), rep(fml$outcome[-1], times = fml$n_terms[-1])),
       family = family,
-      estimate = coef(fit)[id],
-      stderr = sqrt(diag(vcov(fit))[id]),
-      pvalue = pchisq((coef(fit)[id] / sqrt(diag(vcov(fit)))[id])^2, df = 1, lower.tail = FALSE),
-      method = c('Standard', rep('Prognostic', nrow(fml) - 1)),
-      corr = cov2cor(mcov)[id, id1]
+      estimate = coef(fit)[c(id1, id2)],
+      stderr = sqrt(c(var11, diag(mcov22))),
+      pvalue = pchisq((coef(fit)[c(id1, id2)] / sqrt(c(var11, diag(mcov22))))^2, df = 1, lower.tail = FALSE),
+      method = rep(c('Standard', 'Prognostic'), times = c(length(id1), length(id2))),
+      corr = NA
     )
+  if(!is.null(mcov) && length(id1) == 1){
+    nonconfounder$corr <- cov2cor(mcov)[c(id1, id2), id1]
+  }
 
   ret <- rbind(treatment, nonconfounder)
   ret$method <- paste0(ret$method, ifelse(ret$method == 'Prognostic' & ret$pvalue < .05, '*', ''))
-  attr(ret, 'Rel. Eff.') <- mcov[id1, id1] / stderr^2
+  if(!is.null(mcov) && length(id1) == 1){
+    attr(ret, 'Rel. Eff.') <- mcov[id1, id1] / stderr^2
+  }
+  
+  if(fml$func[1] %in% 'kmMO'){
+    
+    conf.type <- fml$arg[fml$func %in% 'kmMO'][1]
+    pated_res <- 
+      treatment %>% 
+      dplyr::select(estimate, stderr) %>% 
+      mutate(LCI = gInverseFunction(conf.type)(estimate - 1.96 * stderr)) %>%
+      mutate(UCI = gInverseFunction(conf.type)(estimate + 1.96 * stderr)) %>% 
+      mutate(estimate = gInverseFunction(conf.type)(estimate)) %>% 
+      dplyr::select(estimate, LCI, UCI)
+    
+    km_res <- 
+      nonconfounder %>% 
+      dplyr::filter(method %in% 'Standard') %>% 
+      dplyr::select(estimate, stderr) %>% 
+      mutate(LCI = gInverseFunction(conf.type)(estimate - 1.96 * stderr)) %>%
+      mutate(UCI = gInverseFunction(conf.type)(estimate + 1.96 * stderr)) %>% 
+      mutate(estimate = gInverseFunction(conf.type)(estimate)) %>% 
+      dplyr::select(estimate, LCI, UCI)
+    
+    pated_curve <- createKaplanMeierCurve(pated_res, str_glue('PATED ({conf.type})'), transform)
+    km_curve <- createKaplanMeierCurve(km_res, str_glue('KM ({conf.type})'), transform)
+    comp_ci <- comparePointwiseConfidenceIntervalWidth(pated_res, km_res, transform)
+    
+    #plot(ggarrange(ggarrange(km_curve, pated_curve, ncol = 2), ggarrange(comp_ci[[1]], comp_ci[[2]], ncol = 2), nrow = 2))
+    plot(ggarrange(km_curve, pated_curve, ncol = 2))
+    
+    attr(ret, 'pated curve') <- pated_curve
+    attr(ret, 'km curve') <- km_curve
+    attr(ret, 'comp ci') <- comp_ci
+    attr(ret, 'conf.type') <- conf.type
+  }
   ret
 
 }

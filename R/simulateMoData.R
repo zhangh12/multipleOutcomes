@@ -20,11 +20,16 @@ simulateMoData <- function(n = 500, hr = 0.8, seed = NULL){
   
   cont <- rnorm(n) # continuous outcome
   bin <- rbinom(n, 1, .5) # binary outcome
-  err <- rnorm(n, sd = 2)
+  err <- rnorm(n, sd = .01)
   trt <- rbinom(n, 1, .5) # fully randomized arm assignment
-  tte <- -log(runif(n)) / exp(log(hr) * trt + 1 * (.8 * cont + 2.5 * bin + pmax_repm + err))
+  tte <- -log(runif(n)) / .05 / exp(log(hr) * trt + 5 * (.8 * cont + 2.5 * bin + 0 * pmax_repm) + err)
+  tte <- tte^.35
   event <- rbinom(n, 1, .9) # event or censored
   tte <- tte * ifelse(event == 1, 1, runif(n))
+  
+  follow_up_time <- 100
+  event[tte > follow_up_time] <- 0
+  tte <- pmin(tte, follow_up_time)
   id <- paste0('uid-', 1:n)
   dat1 <- data.frame(cont, bin, tte, event, trt, id)
   dat2 <- data.frame(repm, trt, id) %>% 

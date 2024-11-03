@@ -4,15 +4,19 @@
 \alias{pated}
 \title{Prognostic Variables Assisted Treatment Effect Detection}
 \usage{
-pated(..., family, data, data_index = NULL)
+pated(
+  ...,
+  data,
+  family = NULL,
+  data_index = NULL,
+  nboot = 0,
+  compute_cov = TRUE,
+  seed = NULL,
+  transform = "identity"
+)
 }
 \arguments{
 \item{...}{formulas of models to be fitted, or moment functions for gmm.}
-
-\item{family}{a character vector of families to be used in the models.
-All families supported by \code{multipleOutcomes} are also supported by \code{pated}.
-\code{family} can be of length 1 if all models are fitted in the same family;
-otherwise family should be specified for each of the models in \code{...}.}
 
 \item{data}{a data frame if all models are fitted on the same dataset;
 otherwise a list of data frames for fitting models in \code{...}. Note that a
@@ -21,6 +25,11 @@ to be equal to the number of models in \code{...}. The row names in a data frame
 are treated as sample IDs. Consequently, for any two records in different
 data frames that correspond to the same sample, their row names should be
 consistent.}
+
+\item{family}{a character vector of families to be used in the models.
+All families supported by \code{multipleOutcomes} are also supported by \code{pated}.
+\code{family} can be of length 1 if all models are fitted in the same family;
+otherwise family should be specified for each of the models in \code{...}.}
 
 \item{data_index}{\code{NULL} if \code{data} is a data frame; otherwise, a vector in
 integer specifying mapping a model in \code{...} to a data frame in \code{data} (a list).}

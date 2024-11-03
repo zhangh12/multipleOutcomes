@@ -5,23 +5,19 @@
 \title{Fitting Regression Models for Multiple Outcomes and Returning the Matrix of
 Covariance}
 \usage{
-multipleOutcomes(..., family, data, data_index = NULL, score_epsilon = 1e-06)
+multipleOutcomes(
+  ...,
+  data,
+  family = NULL,
+  data_index = NULL,
+  nboot = 0,
+  compute_cov = TRUE,
+  seed = NULL,
+  score_epsilon = 1e-06
+)
 }
 \arguments{
 \item{...}{formulas of models to be fitted, or moment functions for gmm.}
-
-\item{family}{a character vector of families to be used in the models.
-Currently only \code{gaussian}, \code{binomial}, \code{coxph}, \code{gmm} and \code{gee} are supported.
-To analyze longitudinal data and repeated measurements, \code{family} should be
-something like \code{gee+id+family+corstr},
-where id is the column name defining cluster (i.e. one patient per cluster).
-The covariance estimate may be inaccurate if number of clusters is too small.
-The supported families for \code{gee} include \code{gaussian}, \code{binomial},
-\code{poisson}, \code{Gamma}, and \code{quasi}. The supported correlation structures include
-\code{independence}, \code{stat_M_dep}, \code{non_stat_M_dep}, \code{exchangeable}, \code{AR-M}
-and \code{unstructured}. So a valid family string is like \code{gee+user_id+binomial+exchangeable}.
-\code{family} can be of length 1 if all models are fitted in the
-same family; otherwise family should be specified for each of the models.}
 
 \item{data}{a data frame if all models are fitted on the same dataset;
 otherwise a list of data frames for fitting models in \code{...}. Note that a
@@ -31,8 +27,23 @@ are treated as sample IDs. Consequently, for any two records in different
 data frames that correspond to the same sample, their row names should be
 consistent.}
 
+\item{family}{a character vector of families to be used in the models.
+Currently only \code{gaussian}, \code{binomial}, \code{coxph}, \code{logrank}, \code{gmm} and \code{gee}
+are supported. To analyze longitudinal data and repeated measurements,
+\code{family} should be something like \code{gee+id+family+corstr},
+where id is the column name defining cluster (i.e. one patient per cluster).
+The covariance estimate may be inaccurate if number of clusters is too small.
+The supported families for \code{gee} include \code{gaussian}, \code{binomial},
+\code{poisson}, \code{Gamma}, and \code{quasi}. The supported correlation structures include
+\code{independence}, \code{stat_M_dep}, \code{non_stat_M_dep}, \code{exchangeable}, \code{AR-M}
+and \code{unstructured}. So a valid family string is like \code{gee+user_id+binomial+exchangeable}.
+\code{family} can be of length 1 if all models are fitted in the
+same family; otherwise family should be specified for each of the models.}
+
 \item{data_index}{\code{NULL} if \code{data} is a data frame; otherwise, a vector in
 integer specifying mapping a model in \code{...} to a data frame in \code{data} (a list).}
+
+\item{nboot}{non-zero integer if bootstrap is adopted. By default 0.}
 
 \item{score_epsilon}{whatever.}
 }

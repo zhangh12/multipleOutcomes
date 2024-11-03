@@ -1,5 +1,6 @@
-
-checkInput <- function(..., family, data, data_index){
+#' Process inputs of `multipleOutcomes` when asymptotic properties are used
+#' to estimate variance-covariance matrix
+checkDefaultInput <- function(..., family, data, data_index){
   
   formulas <- list(...)
   for(i in seq_along(formulas)){

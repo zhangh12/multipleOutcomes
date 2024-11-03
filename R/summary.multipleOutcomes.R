@@ -9,10 +9,15 @@
 #'
 #' @return a list
 #' @export
-#'
+#' 
 summary.multipleOutcomes <- function(object, model_index = NULL, ...){
 
-  se <- sqrt(diag(object$mcov))
+  if(is.null(object$mcov)){
+    se <- apply(object$bootstrap_estimate, 2, sd, na.rm = TRUE)
+  }else{
+    se <- sqrt(diag(object$mcov))
+  }
+  
   tval <- coef(object) / se
 
   TAB <- cbind(Estimate = coef(object),
