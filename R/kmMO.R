@@ -1,4 +1,11 @@
-
+#' xxx
+#' @param formula a survival object created by \code{survival::Surv()}. 
+#' @param conf.type type of confidence interval. It must be one of \code{"log"}, 
+#' \code{"log-log"}, \code{"plain"}, \code{"logit"}, or \code{"arcsin"}. 
+#' @param times numeric. A vector of times to compute the survival probabilities. 
+#' By default, i.e. \code{NULL}, jump times in data is used. 
+#' @param data a data frame. User should use its default value \code{NULL}. 
+#' 
 #' @export
 kmMO <- function(formula, conf.type, times = NULL, data = NULL){
   

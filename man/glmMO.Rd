@@ -7,6 +7,14 @@ to be used when bootstrap is needed.}
 \usage{
 glmMO(formula, family, data = NULL)
 }
+\arguments{
+\item{formula}{an object of class \code{formula}.}
+
+\item{family}{character family, could be \code{gaussian} or \code{bionomial} only.}
+
+\item{data}{a data frame of data. User does not need to specify it. Always
+use its default value \code{NULL}.}
+}
 \description{
 return estimates from GLM model
 to be used when bootstrap is needed.

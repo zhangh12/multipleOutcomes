@@ -1,8 +1,8 @@
 
-#' Compute bootstrapped variance-covariance matrix of parameters in given models
-#' It is used when at least one of the specified model needs bootstrap, 
-#' for example, Kaplan-Merier estimate for probability of survival, or 
-#' quantiles are used for prognostic variables.
+# Compute bootstrapped variance-covariance matrix of parameters in given models
+# It is used when at least one of the specified model needs bootstrap, 
+# for example, Kaplan-Merier estimate for probability of survival, or 
+# quantiles are used for prognostic variables.
 bootstrapMultipleOutcomes <- function(..., data, data_index = NULL, nboot = 10, compute_cov = TRUE, seed = NULL){
   
   input <- checkBootstrapInput(..., data = data, data_index = data_index)

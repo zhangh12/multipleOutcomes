@@ -36,6 +36,11 @@
 #' integer specifying mapping a model in `...` to a data frame in `data` (a list).
 #' @param nboot non-zero integer if bootstrap is adopted. By default 0.
 #' @param score_epsilon whatever.
+#' @param compute_cov logic. If \code{TRUE}, empirical covariance matrix is computed 
+#' using bootstrap estimate and returned. Bootstrap estimate will be abandoned. If 
+#' \code{FALSE}, bootstrap estimate will be returned and no empirical covariance 
+#' matrix is computed. 
+#' @param seed random seed when generate bootstrap data. 
 #'
 #' @return It returns an object of class "multipleOutcomes", which is a list
 #' containing the following components:

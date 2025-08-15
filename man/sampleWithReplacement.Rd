@@ -9,6 +9,9 @@ out in each of the groups}
 \usage{
 sampleWithReplacement(data)
 }
+\arguments{
+\item{data}{a data frame to be sampled from.}
+}
 \description{
 Generate bootstrap dataset.
 When missing data presents, dataset is split into groups. Patients in

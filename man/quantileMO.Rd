@@ -7,6 +7,14 @@ formula can be endpoint ~ trt}
 \usage{
 quantileMO(formula, data = NULL, probs = c(0.25, 0.5, 0.75))
 }
+\arguments{
+\item{formula}{an object of class \code{formula}.}
+
+\item{data}{a data frame. User should always use its default value \code{NULL}.}
+
+\item{probs}{numeric. A vector of probabilities with values in \code{[0, 1]}.
+By default, difference in first quartile, median, and third quartile are computed.}
+}
 \description{
 Return difference in quantile between arms
 formula can be endpoint ~ trt

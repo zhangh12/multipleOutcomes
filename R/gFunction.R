@@ -1,6 +1,6 @@
 
-#' g(S(t)), a transformed estimate of survival probability.
-#' See https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_lifetest_details08.htm
+# g(S(t)), a transformed estimate of survival probability.
+# See https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.4/statug/statug_lifetest_details08.htm
 gFunction <- function(conf.type = c('log','log-log','plain', 'logit')){
   
   conf.type = match.arg(conf.type)
@@ -34,7 +34,7 @@ gFunction <- function(conf.type = c('log','log-log','plain', 'logit')){
       if(conf.type %in% 'plain'){
         gPlain
       }else{
-        glogit
+        gLogit
       }
     }
   }

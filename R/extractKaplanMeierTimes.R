@@ -1,6 +1,6 @@
 
-#' Figure out the time points with at least one event. 
-#' This is used to generate KM-like curves.
+# Figure out the time points with at least one event. 
+# This is used to generate KM-like curves.
 extractKaplanMeierTimes <- function(coef, sort = TRUE){
   
   labels <- names(coef)

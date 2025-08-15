@@ -1,4 +1,8 @@
-
+#' xxx
+#' @param formula a survival object using function \code{survival::Surv()}. 
+#' @param data a data frame. User should always use its default value \code{NULL}. 
+#' @param ties method to handle ties, must be \code{"efron"}, \code{"breslow"}, 
+#' or \code{"exact"}. 
 #' @export
 logrankMO <- function(formula, data = NULL, ties = c('efron', 'breslow', 'exact')){
   

@@ -1,6 +1,6 @@
 
-#' Compute asymptotic variance-covariance matrix of parameters in given models
-#' It is used for models where bootstrap is not needed
+# Compute asymptotic variance-covariance matrix of parameters in given models
+# It is used for models where bootstrap is not needed
 asymptoticMultipleOutcomes <- function(..., data, family, data_index = NULL, score_epsilon = 1e-6){
   
   input <- checkDefaultInput(..., family = family, data = data, data_index = data_index)
@@ -43,10 +43,10 @@ asymptoticMultipleOutcomes <- function(..., data, family, data_index = NULL, sco
             if(!(config$id %in% names(data[[data_index[i]]]))){
               stop(str_glue('{config$id} is not in data[[{data_index[i]}]]'))
             }
-            data[[data_index[i]]]$gee_id <- data[[data_index[i]]][, config$id]
+            id <- data[[data_index[i]]][, config$id]
             suppressMessages(
               capture.output(
-                models[[i]] <- gee(formulas[[i]], id = gee_id, data = data[[data_index[i]]], family = config$family, corstr = config$corstr), 
+                models[[i]] <- gee(formulas[[i]], id = id, data = data[[data_index[i]]], family = config$family, corstr = config$corstr), 
                 file = NULL
               )
             )

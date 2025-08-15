@@ -33,8 +33,11 @@ simulateMoData <- function(n = 500, hr = 0.8, seed = NULL){
   id <- paste0('uid-', 1:n)
   dat1 <- data.frame(cont, bin, tte, event, trt, id)
   dat2 <- data.frame(repm, trt, id) %>% 
-    pivot_longer(c(repm1, repm2, repm3), names_to = 'time', values_to = 'repm') %>% 
-    dplyr::select(repm, time, trt, id) %>% 
+    pivot_longer(
+      cols = all_of(paste0('repm', 1:3)), 
+      names_to = 'time', 
+      values_to = 'repm') %>% 
+    dplyr::select(.data$repm, .data$time, .data$trt, .data$id) %>% 
     as.data.frame()
   
   invisible(list(dat1 = dat1, dat2 = dat2))

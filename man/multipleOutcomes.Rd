@@ -45,6 +45,13 @@ integer specifying mapping a model in \code{...} to a data frame in \code{data} 
 
 \item{nboot}{non-zero integer if bootstrap is adopted. By default 0.}
 
+\item{compute_cov}{logic. If \code{TRUE}, empirical covariance matrix is computed
+using bootstrap estimate and returned. Bootstrap estimate will be abandoned. If
+\code{FALSE}, bootstrap estimate will be returned and no empirical covariance
+matrix is computed.}
+
+\item{seed}{random seed when generate bootstrap data.}
+
 \item{score_epsilon}{whatever.}
 }
 \value{

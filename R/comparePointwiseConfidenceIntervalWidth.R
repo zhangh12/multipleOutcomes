@@ -1,8 +1,8 @@
 
-#' Generate two curves of survival probability with pointwise 95% confidence 
-#' interval: 
-#' 1. PATED adjusted KM curve
-#' 2. Conventional KM curve
+# Generate two curves of survival probability with pointwise 95% confidence 
+# interval: 
+# 1. PATED adjusted KM curve
+# 2. Conventional KM curve
 comparePointwiseConfidenceIntervalWidth <- function(pated_res, km_res, transform = 'identity'){
   
   conf.type <- attr(pated_res, 'conf.type')
@@ -35,8 +35,8 @@ comparePointwiseConfidenceIntervalWidth <- function(pated_res, km_res, transform
   m <- merge(pated_coordinate, km_coordinate, by = c('Time', 'Strata'), all = TRUE)
   
   p1 <- 
-    ggplot(m, aes(x = Time, y = km_ci_width / pated_ci_width, group = Strata)) + 
-      geom_point(aes(color = Strata), size = .5) + 
+    ggplot(m, aes(x = .data$Time, y = .data$km_ci_width / .data$pated_ci_width, group = .data$Strata)) + 
+      geom_point(aes(color = .data$Strata), size = .5) + 
       scale_x_continuous(transform = transform) + 
       theme_minimal() +
       labs(title = "Widths of Pointwise 95% CI",
@@ -44,8 +44,8 @@ comparePointwiseConfidenceIntervalWidth <- function(pated_res, km_res, transform
            y = 'KM / PATED')
   
   p2 <- 
-    ggplot(m, aes(x = km_estimate, y = pated_estimate, group = Strata)) + 
-    geom_point(aes(color = Strata), size = .5) + 
+    ggplot(m, aes(x = .data$km_estimate, y = .data$pated_estimate, group = .data$Strata)) + 
+    geom_point(aes(color = .data$Strata), size = .5) + 
     geom_abline(intercept = 0, slope = 1, linetype = 'dashed') + 
     theme_minimal() + 
     labs(title = 'Estimates of S(t)', 

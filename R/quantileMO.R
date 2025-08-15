@@ -1,6 +1,11 @@
 
 #' Return difference in quantile between arms
 #' formula can be endpoint ~ trt
+#' @param formula an object of class \code{formula}. 
+#' @param data a data frame. User should always use its default value \code{NULL}. 
+#' @param probs numeric. A vector of probabilities with values in \code{[0, 1]}. 
+#' By default, difference in first quartile, median, and third quartile are computed. 
+#' 
 #' @export
 quantileMO <- function(formula, data = NULL, probs = c(.25, .5, .75)){
   
@@ -27,7 +32,9 @@ quantileMO <- function(formula, data = NULL, probs = c(.25, .5, .75)){
   
   split_data <- split(mf[[outcome]], mf[[group]])
   
-  qs <- lapply(split_data, function(sdata){quantile(sdata, probs = probs)}) %>% do.call(cbind, .)
+  qs <- lapply(split_data, function(sdata){quantile(sdata, probs = probs)})
+  qs <- do.call(cbind, qs)
+  
   qdiff <- qs[, 1] - qs[, 2]
   names(qdiff) <- paste0(group, '_', rownames(qs))
   

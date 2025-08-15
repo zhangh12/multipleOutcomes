@@ -1,8 +1,8 @@
 
-#' df is of length that equals to the number of specified models
-#' df[i] is the number of parameters in model i
-#' This function returns index of parameters of model i in the vector of 
-#' parameters of all models
+# df is of length that equals to the number of specified models
+# df[i] is the number of parameters in model i
+# This function returns index of parameters of model i in the vector of 
+# parameters of all models
 IDMapping <- function(df, i, var_name = NULL){
   if(i == 1){
     ids <- 1:df[1]

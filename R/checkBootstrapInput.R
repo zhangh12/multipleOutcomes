@@ -1,6 +1,6 @@
 
-#' Process inputs of `multipleOutcomes` when bootstrap will be used to estimate 
-#' variance-covariance matrix
+# Process inputs of `multipleOutcomes` when bootstrap will be used to estimate 
+# variance-covariance matrix
 checkBootstrapInput <- function(..., data, data_index){
   
   calls <- as.list(substitute(list(...)))[-1L]

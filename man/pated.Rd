@@ -33,6 +33,17 @@ otherwise family should be specified for each of the models in \code{...}.}
 
 \item{data_index}{\code{NULL} if \code{data} is a data frame; otherwise, a vector in
 integer specifying mapping a model in \code{...} to a data frame in \code{data} (a list).}
+
+\item{nboot}{non-zero integer if bootstrap is adopted. By default 0.}
+
+\item{compute_cov}{logic. If \code{TRUE}, empirical covariance matrix is computed
+using bootstrap estimate and returned. Bootstrap estimate will be abandoned. If
+\code{FALSE}, bootstrap estimate will be returned and no empirical covariance
+matrix is computed.}
+
+\item{seed}{random seed when generate bootstrap data.}
+
+\item{transform}{character. Now only supports \code{"identity"}.}
 }
 \value{
 a data frame of testing results.

@@ -8,6 +8,8 @@
 #' 
 #' @importFrom stringr str_extract
 #' @importFrom ggpubr ggarrange
+#' @importFrom stats rbinom rnorm runif sd time var
+#' 
 #' @param ... formulas of models to be fitted, or moment functions for gmm. 
 #' @param family a character vector of families to be used in the models.
 #' All families supported by `multipleOutcomes` are also supported by `pated`. 
@@ -22,6 +24,13 @@
 #' consistent.
 #' @param data_index `NULL` if `data` is a data frame; otherwise, a vector in
 #' integer specifying mapping a model in `...` to a data frame in `data` (a list).
+#' @param nboot non-zero integer if bootstrap is adopted. By default 0.
+#' @param compute_cov logic. If \code{TRUE}, empirical covariance matrix is computed 
+#' using bootstrap estimate and returned. Bootstrap estimate will be abandoned. If 
+#' \code{FALSE}, bootstrap estimate will be returned and no empirical covariance 
+#' matrix is computed. 
+#' @param seed random seed when generate bootstrap data. 
+#' @param transform character. Now only supports \code{"identity"}. 
 #'
 #' @return a data frame of testing results.
 #' @export
@@ -185,16 +194,16 @@ pated <-
       mutate(LCI = gInverseFunction(conf.type)(estimate - 1.96 * stderr)) %>%
       mutate(UCI = gInverseFunction(conf.type)(estimate + 1.96 * stderr)) %>% 
       mutate(estimate = gInverseFunction(conf.type)(estimate)) %>% 
-      dplyr::select(estimate, LCI, UCI)
+      dplyr::select(dplyr::all_of(c("estimate", "LCI", "UCI")))
     
     km_res <- 
       nonconfounder %>% 
-      dplyr::filter(method %in% 'Standard') %>% 
+      dplyr::filter(.data$method %in% 'Standard') %>% 
       dplyr::select(estimate, stderr) %>% 
       mutate(LCI = gInverseFunction(conf.type)(estimate - 1.96 * stderr)) %>%
       mutate(UCI = gInverseFunction(conf.type)(estimate + 1.96 * stderr)) %>% 
       mutate(estimate = gInverseFunction(conf.type)(estimate)) %>% 
-      dplyr::select(estimate, LCI, UCI)
+      dplyr::select(dplyr::all_of(c("estimate", "LCI", "UCI")))
     
     pated_curve <- createKaplanMeierCurve(pated_res, str_glue('PATED ({conf.type})'), transform)
     km_curve <- createKaplanMeierCurve(km_res, str_glue('KM ({conf.type})'), transform)

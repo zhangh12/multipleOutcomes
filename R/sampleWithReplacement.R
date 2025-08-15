@@ -4,6 +4,9 @@
 #' out in each of the groups
 #' @importFrom dplyr summarise
 #' @importFrom dplyr group_by
+#' 
+#' @param data a data frame to be sampled from. 
+#' 
 sampleWithReplacement <- function(data){
   
   uid <- 
@@ -13,10 +16,10 @@ sampleWithReplacement <- function(data){
         df <- data[[idx]]
         df$index <- idx
         df[, c('id', 'index'), drop = FALSE]
-      }) %>% 
-    do.call(rbind, .) %>% 
-    group_by(id) %>% 
-    summarise(group = paste0(paste0('data-', sort(unique(index))), collapse = ','))
+      })
+  uid <- do.call(rbind, uid) %>% 
+    group_by(.data$id) %>% 
+    summarise(group = paste0(paste0('data-', sort(unique(.data$index))), collapse = ','))
   
   unique_dataset_group <- sort(unique(uid$group))
   selected_uid <- list()
@@ -43,7 +46,7 @@ sampleWithReplacement <- function(data){
         for(i in seq_along(selected_uid[[group]])){
           sid <- selected_uid[[group]][i]
           new_sid <- rownames(tmp)[i]
-          tmp_data <- data[[dat_id]] %>% dplyr::filter(id %in% sid)
+          tmp_data <- data[[dat_id]] %>% dplyr::filter(.data$id %in% sid)
           tmp_data$id <- new_sid
           bdata[[dat_id]] <- rbind(bdata[[dat_id]], tmp_data)
           rm(tmp_data, sid, new_sid)
