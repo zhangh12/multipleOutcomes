@@ -182,7 +182,7 @@ pated <-
     nonconfounder$corr <- cov2cor(mcov)[c(id1, id2), id1]
   }
 
-  ret <- rbind(treatment, nonconfounder)
+  ret <- rbind(treatment, nonconfounder %>% arrange(desc(abs(.data$corr))))
   ret$method <- paste0(ret$method, ifelse(ret$method == 'Prognostic' & ret$pvalue < .05, '*', ''))
   if(!is.null(mcov) && length(id1) == 1){
     attr(ret, 'Rel. Eff.') <- mcov[id1, id1] / stderr^2

@@ -70,25 +70,30 @@ plot(fit)
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
 
+For each of the covariates, a regression model `covar ~ rx` is fitted to
+compute the slope coefficient $\hat b$. The correlation between $\hat b$
+and $\hat\beta$, the unadjusted estimate of treatment effect
+(`outcome ~ rx`) are computed in the column `corr`.
+
 ``` r
 print(fit)
 #>           term   family estimate stderr pvalue     method    corr
 #> 1      outcome    PATED  -0.7514  0.247 0.0023      PATED      NA
 #> 2      outcome binomial  -0.7051  0.253 0.0053   Standard  1.0000
 #> 3         risk gaussian   0.0833  0.072 0.2450 Prognostic  0.1397
-#> 4       gender binomial   0.1710  0.201 0.3940 Prognostic  0.0041
-#> 5          sod binomial   0.2482  0.215 0.2472 Prognostic -0.0105
-#> 6          pep binomial  -0.0021  0.223 0.9923 Prognostic  0.1263
-#> 7      recpanc binomial  -0.0700  0.178 0.6945 Prognostic  0.0331
-#> 8      psphinc binomial   0.1335  0.165 0.4181 Prognostic  0.0375
-#> 9       precut binomial  -0.0901  0.364 0.8046 Prognostic  0.0060
-#> 10      difcan binomial   0.1057  0.186 0.5694 Prognostic  0.0481
-#> 11         amp binomial   0.0411  0.479 0.9316 Prognostic  0.0829
-#> 12      paninj binomial  -0.3609  0.274 0.1880 Prognostic  0.0535
-#> 13      acinar binomial   0.2753  0.396 0.4871 Prognostic  0.0574
-#> 14       asa81 binomial  -0.3947  0.316 0.2115 Prognostic -0.0079
-#> 15         asa binomial  -0.0723  0.279 0.7953 Prognostic -0.0242
-#> 16 prophystent binomial   0.2153  0.190 0.2562 Prognostic  0.0341
-#> 17  therastent binomial  -0.2529  0.316 0.4233 Prognostic -0.0494
-#> 18     pdstent binomial   0.1812  0.215 0.3990 Prognostic  0.0063
+#> 4          pep binomial  -0.0021  0.223 0.9923 Prognostic  0.1263
+#> 5          amp binomial   0.0411  0.479 0.9316 Prognostic  0.0829
+#> 6       acinar binomial   0.2753  0.396 0.4871 Prognostic  0.0574
+#> 7       paninj binomial  -0.3609  0.274 0.1880 Prognostic  0.0535
+#> 8   therastent binomial  -0.2529  0.316 0.4233 Prognostic -0.0494
+#> 9       difcan binomial   0.1057  0.186 0.5694 Prognostic  0.0481
+#> 10     psphinc binomial   0.1335  0.165 0.4181 Prognostic  0.0375
+#> 11 prophystent binomial   0.2153  0.190 0.2562 Prognostic  0.0341
+#> 12     recpanc binomial  -0.0700  0.178 0.6945 Prognostic  0.0331
+#> 13         asa binomial  -0.0723  0.279 0.7953 Prognostic -0.0242
+#> 14         sod binomial   0.2482  0.215 0.2472 Prognostic -0.0105
+#> 15       asa81 binomial  -0.3947  0.316 0.2115 Prognostic -0.0079
+#> 16     pdstent binomial   0.1812  0.215 0.3990 Prognostic  0.0063
+#> 17      precut binomial  -0.0901  0.364 0.8046 Prognostic  0.0060
+#> 18      gender binomial   0.1710  0.201 0.3940 Prognostic  0.0041
 ```
