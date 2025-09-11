@@ -9,6 +9,9 @@
 #' @importFrom stringr str_extract
 #' @importFrom ggpubr ggarrange
 #' @importFrom stats rbinom rnorm runif sd time var
+#' @importFrom dplyr row_number first case_when bind_rows filter arrange desc 
+#' @importFrom ggplot2 geom_hline geom_vline scale_color_manual theme element_blank
+#' @importFrom rlang .data
 #' 
 #' @param ... formulas of models to be fitted, or moment functions for gmm. 
 #' @param family a character vector of families to be used in the models.
@@ -217,6 +220,59 @@ pated <-
     attr(ret, 'comp ci') <- comp_ci
     attr(ret, 'conf.type') <- conf.type
   }
+  class(ret) <- c('pated', class(ret))
   ret
 
+}
+
+#' Plot PATED Analysis Results
+#'
+#' @param x an object returned from \code{pated()}. 
+#' @param ... currently not supported.
+#' 
+#' @returns \code{NULL}
+#' @export
+#'
+plot.pated <- function(x, ...){
+  
+  x_plot <- x %>%
+    mutate(term = ifelse(row_number() == 2 & .data$term == first(.data$term),
+                         paste0(" ", .data$term),
+                         .data$term)) %>%
+    mutate(
+      rowid = row_number(),
+      z = .data$estimate / .data$stderr,
+      group = case_when(
+        rowid == 1 ~ "PATED",
+        rowid == 2 ~ "Unadjusted",
+        TRUE ~ "Prognostic"
+      )
+    )
+  
+  x_plot <- bind_rows(
+    x_plot %>% filter(.data$rowid <= 2),
+    x_plot %>% filter(.data$rowid > 2) %>% arrange(desc(abs(.data$corr)))
+  )
+  
+  x_plot$variable <- factor(x_plot$term, levels = rev(x_plot$term))
+  
+  p <- 
+    ggplot(x_plot, aes(x = .data$z, y = .data$variable, color = .data$group)) +
+    geom_point(size = 3) +
+    geom_hline(yintercept = length(x_plot$variable) - 2 + 0.5,
+               linetype = "dashed", color = "gray80") +
+    geom_vline(xintercept = 0, linetype = "dashed") +
+    geom_vline(xintercept = c(-1.96, 1.96), linetype = "dashed", color = "gray60") +
+    scale_color_manual(values = c("PATED" = "red",
+                                  "Unadjusted" = "blue",
+                                  "Prognostic" = "gray40"),
+                       breaks = c("PATED", "Unadjusted", "Prognostic")) +
+    labs(x = "Z value (variable ~ arm)", y = "Variable") +
+    theme_minimal() +
+    theme(legend.title = element_blank())
+  
+  plot(p)
+  
+  invisible(NULL)
+  
 }

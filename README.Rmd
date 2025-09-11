@@ -1,0 +1,77 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# multipleOutcomes
+
+<!-- badges: start -->
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+<!-- badges: end -->
+
+The goal of multipleOutcomes is to fit statistical models for multiple outcomes simultaneously. It computes estimates of parameters across fitted models and returns the matrix of asymptotic covariance. Various applications of this package, including PATED (Prognostic Variables Assisted Treatment Effect Detection), multiple comparison adjustment, conditional power are illustrated.
+
+
+## Installation
+
+You can install the development version of multipleOutcomes from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pak("zhangh12/multipleOutcomes")
+```
+
+## Example
+
+Let's get started by analyzing a really randomized trial data
+
+```{r warning = FALSE, message = FALSE}
+library(multipleOutcomes)
+library(dplyr)
+
+options(digits = 2)
+
+data(indo)
+
+fit <- pated(
+  outcome ~ rx, 
+  
+  risk ~ rx, 
+  gender ~ rx, 
+  sod ~ rx, 
+  pep ~ rx,
+  recpanc ~ rx,
+  psphinc ~ rx, 
+  precut ~ rx, 
+  difcan ~ rx,  
+  amp ~ rx, 
+  paninj ~ rx, 
+  acinar ~ rx,
+  asa81 ~ rx, 
+  asa ~ rx,
+  prophystent ~ rx, 
+  therastent ~ rx, 
+  pdstent ~ rx, 
+  
+  data = indo,
+  family = c('binomial', 
+             rep('gaussian', 1), 
+             rep('binomial', 15))
+)
+
+plot(fit)
+print(fit)
+```
+
+
+
