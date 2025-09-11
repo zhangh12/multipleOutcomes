@@ -73,7 +73,7 @@ plot(fit)
 For each of the covariates, a regression model `covar ~ rx` is fitted to
 compute the slope coefficient $\hat b$. The correlation between $\hat b$
 and $\hat\beta$, the unadjusted estimate of treatment effect
-(`outcome ~ rx`) are computed in the column `corr`.
+(`outcome ~ rx`), are computed in the column `corr`.
 
 ``` r
 print(fit)
