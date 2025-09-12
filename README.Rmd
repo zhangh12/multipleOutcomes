@@ -27,19 +27,28 @@ The goal of multipleOutcomes is to fit statistical models for multiple outcomes 
 You can install the development version of multipleOutcomes from [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("pak")
-pak::pak("zhangh12/multipleOutcomes")
+if (!require("remotes")) {
+  install.packages("remotes")
+}
+remotes::install_github(
+  "zhangh12/multipleOutcomes", 
+  build_manual = TRUE, 
+  force = TRUE
+)
 ```
 
 ## Example
 
-Let's get started by analyzing a really randomized trial data
+Let's get started by analyzing a real randomized trial data. The data was from a randomized clinical trial of indomethacin to prevent post-ERCP pancreatitis. The binary endpoint is post-ERCP pancreatitis (yes/no). It was collected, reformatted and shared by Dr. Peter Higgins in his R package [`medicaldata`](https://cloud.r-project.org/web/packages/medicaldata/index.html). For more information, please refer to the data set `indo_rct` in `medicaldata`, and the [manuscript](https://www.nejm.org/doi/full/10.1056/NEJMoa1111103).
+
+Here we use the PATED method to estimate marginal treatment effect on post-ERCP pancreatitis, adjusting for a set of risk factors for PEP as potential prognostic covariates. I am not an expert of this disease, so I simply follow the description information of the covariates in `medicaldata`. 
+
+Here we compare PATED with unconditional logistic regression model in estimating the treatment effect. For each of the covariates, a regression model `covar ~ rx` is fitted to compute the slope coefficient $\hat b$. The correlation between $\hat b$ and $\hat\beta$, the unadjusted estimate of treatment effect (`outcome ~ rx`), are computed in the column `corr`. 
 
 ```{r warning = FALSE, message = FALSE}
 library(multipleOutcomes)
-library(dplyr)
 
-options(digits = 2)
+options(digits = 4)
 
 data(indo)
 
@@ -72,11 +81,29 @@ fit <- pated(
 plot(fit)
 ```
 
-For each of the covariates, a regression model `covar ~ rx` is fitted to compute the slope coefficient $\hat b$. The correlation between $\hat b$ and $\hat\beta$, the unadjusted estimate of treatment effect (`outcome ~ rx`), are computed in the column `corr`. 
+The plot above shows that all covariates are very well balanced between two arms (i.e. z-values of grey points are close to zero). 
 
 ```{r}
 print(fit)
 ```
+
+It is evident that PATED produces a treatment effect estimate (`r fit$estimate[1]`) that is close to the one from the unconditional logistic regression model (`r fit$estimate[2]`), indicating a good property of unbiasness. Meanwhile, a slightly lower SE (`r fit$stderr[1]` v.s. `r fit$stderr[2]`) and more significant p-value (`r fit$pvalue[1]` v.s. `r fit$pvalue[2]`) are obtained by PATED. 
+
+In comparison, we adjust the list of covariates in a logistic regression to estimate conditional log odds ratio of treatment. We have to exclude `asa81` and `asa` due to missing data, and `prophystent`, `therastent` and `pdstent` due to numerical instability. 
+
+```{r}
+logit <- glm(
+  outcome ~ rx + risk + gender + sod + pep + recpanc + psphinc + precut + difcan + amp + paninj + acinar, 
+  family = 'binomial', data = indo
+) |> summary()
+
+logit
+```
+
+
+The conditional treatment effect is estimated as `r logit$coef['rx', 'Estimate']`, with SE `r logit$coef['rx', 'Std. Error']` and p-value `r logit$coef['rx', 'Pr(>|z|)']`. 
+
+In this example, it seems like using unconditional logistic regression or PATED can underestimate treatment effect compared to regression adjustment. However, this is not always the case in practice. We also see examples where the regression adjustment can underestimate the treatment effect substantially. In fact, such a comparison is invalid because they are estimating different parameters under different definitions of treatment effect. In terms of statistical power of detecting treatment effect, comprehensive simulation studies show that PATED always outperform unconditional logistic regression, and is comparable to (if not better than) regression adjustment. 
 
 
 
