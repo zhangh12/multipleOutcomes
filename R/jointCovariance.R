@@ -79,17 +79,22 @@
 #'     logrank_(Surv(time=y, event=death) ~ trt, data_index = 1),
 #'     glm_(z1 ~ trt, family = 'binomial', data_index = 1), 
 #'     glm_(z2 ~ trt, family = 'gaussian', data_index = 1), 
-#'     data=list(dat1, dat2))
+#'     gee_(x ~ trt, id = 'id', 
+#'          family = 'gaussian', corstr = 'independence', data_index = 2), 
+#'     data = list(dat1, dat2))
 #'  
 #'  fit
 #'  
-#'  ## to use bootstrap, set (large) nboot
+#'  ## to use bootstrap, set (large) nboot. nboot = 100 in this example is 
+#'  ## too small. In this example, nboot = 1000 would give pretty close mcov
 #'  bfit <- 
 #'     jointCovariance(
 #'     logrank_(Surv(time=y, event=death) ~ trt, data_index = 1),
 #'     glm_(z1 ~ trt, family = 'binomial', data_index = 1), 
 #'     glm_(z2 ~ trt, family = 'gaussian', data_index = 1), 
-#'     data=list(dat1, dat2), nboot = 10)
+#'     gee_(x ~ trt, id = 'id', 
+#'          family = 'gaussian', corstr = 'independence', data_index = 2), 
+#'     data = list(dat1, dat2), nboot = 100)
 #'  
 #'  bfit
 #'  
