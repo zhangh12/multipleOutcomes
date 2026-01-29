@@ -1,4 +1,21 @@
-#'
+#' Creating Objects of Proportional Hazards Regression Model
+#' 
+#' @description
+#' `coxph_` is a wrapper function of `survival::coxph` to create an object to be 
+#' passed into `jointCovariance`, the main function of this package through its 
+#' argument `...`. The object defines how a proportional hazard model would be 
+#' fitted. 
+#' 
+#' @param formula see `formula` in `survival::coxph`. 
+#' @param data_index integer. Index of the data frame in the `data` argument of
+#' `jointCovariance` to be used when fitting a proportional hazards model. 
+#' 
+#' @details
+#' 
+#' Not all arguments of `survival::coxph` are supported in `coxph_` due to the 
+#' complexity in handling environment and scope, which is particularly difficult 
+#' for arguments like `weights`, `subset`, etc. 
+#' 
 #' @export
 coxph_ <- function(formula, data_index = 1) {
   structure(
