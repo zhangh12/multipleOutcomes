@@ -24,5 +24,9 @@ make_adapter <- function(spec, data_list){
     return(GEEAdapter$new(spec, dat))
   }
   
+  if(inherits(spec, "jc_spec_mmrm")){
+    return(MMRMAdapter$new(spec, dat))
+  }
+  
   stop("Unsupported spec type: ", paste(class(spec), collapse = ", "))
 }

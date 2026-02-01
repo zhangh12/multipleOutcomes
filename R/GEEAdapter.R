@@ -7,13 +7,15 @@ GEEAdapter <- R6::R6Class(
       
       self$type <- 'gee'
       
-      id <- self$data[[self$spec$id]]
+      id <- as.factor(self$data[[self$spec$id_col]])
+      dat <- self$data
+      dat$id <- id
       
       suppressMessages(
         capture.output(
           self$fit <- gee(formula = self$spec$formula, 
                           id = id, 
-                          data = self$data, 
+                          data = dat, 
                           family = self$spec$family, 
                           corstr = self$spec$corstr,
                           R = self$spec$R, 
@@ -28,10 +30,13 @@ GEEAdapter <- R6::R6Class(
       
       ## score
       self$score <- self$fit$score
-      rownames(self$score) <- 1:nrow(self$score)
+      
+      rownames(self$score) <- self$fit$score_id
+      self$sample_id <- rownames(self$score)
+      self$n <- nrow(self$score)
       
       ## inv_hess
-      self$inv_hess <- solve(-self$fit$hess / nrow(self$score))
+      self$inv_hess <- solve(-self$fit$hess / self$n)
       
       invisible(self)
     },
@@ -44,8 +49,8 @@ GEEAdapter <- R6::R6Class(
       ## id <- as.double(id)
       ## in R/gee.R in this package or R/ugee.R in the gee package. 
       ## That line of code could be in trouble if id is a character vector. 
-      id <- as.factor(bdata[[self$spec$id]])
-      bdata[[self$spec$id]] <- id
+      id <- as.factor(bdata[[self$spec$id_col]])
+      bdata$id <- id
       
       suppressMessages(
         capture.output(

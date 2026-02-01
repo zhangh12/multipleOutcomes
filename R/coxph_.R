@@ -17,12 +17,13 @@
 #' for arguments like `weights`, `subset`, etc. 
 #' 
 #' @export
-coxph_ <- function(formula, data_index = 1) {
+coxph_ <- function(formula, data_index) {
   structure(
     list(
       engine = "coxph",
       formula = formula,
-      data_index = data_index
+      data_index = data_index,
+      id_col = 'pid'
     ),
     class = c("jc_spec_coxph", "jc_spec")
   )

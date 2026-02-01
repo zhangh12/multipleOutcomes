@@ -15,11 +15,16 @@ GLMAdapter <- R6::R6Class(
       self$estimate <- stats::coef(self$fit)
       
       ## score
-      dm <- model.matrix(self$spec$formula, model.frame(self$spec$formula, self$data))
-      self$score <- resid(self$fit, type = 'response') * dm
+      self$score <- sandwich::estfun(self$fit)
+      self$n <- stats::nobs(self$fit)
+      stopifnot(self$n == nrow(self$score))
+      
+      kept_ids <- setdiff(seq_len(nrow(self$data)), self$fit$na.action)
+      rownames(self$score) <- self$data[[self$spec$id_col]][kept_ids]
+      self$sample_id <- rownames(self$score)
       
       ## inv_hess
-      self$inv_hess <- inverseHessianMatrixGlm(self$spec$family, dm, self$fit)
+      self$inv_hess <- -sandwich::bread(self$fit)
       
       invisible(self)
     },

@@ -38,6 +38,8 @@ gee <- function(formula = formula(data), id = id, data = parent.frame(),
   }
   offset <- model.extract(m, offset)
   id <- model.extract(m, id)
+  id_raw <- id
+  print(class(id_raw))
   if(is.null(id)) {
     stop("Id variable not found")
   }
@@ -191,11 +193,13 @@ gee <- function(formula = formula(data), id = id, data = parent.frame(),
   fit$family <- family
   fit$y <- as.vector(y)
   fit$id <- as.vector(id)
+  fit$score_id <- rle(as.character(id_raw))$values
   fit$max.id <- z$mc
   z$wcor <- matrix(z$wcor, ncol = maxclsz)
   fit$working.correlation <- z$wcor
   fit$scale <- z$sc
   fit$score <- z$score
+  stopifnot(length(fit$score_id) == nrow(fit$score))
   fit$hess <- z$hess
   fit$robust.variance <- z$rv # solve(hess)%*% (t(score)%*% score) %*% solve(hess)
   fit$naive.variance <- z$nv

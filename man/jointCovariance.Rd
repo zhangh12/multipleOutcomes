@@ -15,9 +15,11 @@ and \code{gmm_()}.}
 otherwise a list of data frames for fitting models in \code{...}. Note that a
 dataset can be used to fit multiple models, thus, \code{length(data)} is unnecessary
 to be equal to the number of models in \code{...}. The row names in a data frame
-are treated as sample IDs. Consequently, for any two records in different
-data frames that correspond to the same sample, their row names should be
-consistent.}
+are not treated as subject IDs. Instead, all data frame should consist of
+a column \code{pid} as subject IDs. For any two records in different
+data frames that correspond to the same subject, their values in \code{pid} should
+be consistent. For data frames to be used by GEE, \code{pid} defines clusters.
+See \code{id} and the Details section of \code{gee:gee}.}
 
 \item{nboot}{non-zero integer if bootstrap is adopted. By default 0.}
 
@@ -61,53 +63,67 @@ library(tidyr)
 genData <- function(seed = NULL){
   
   set.seed(seed)
-  n <- 200
-  sigma <- matrix(c(1, .6, .6, 1), 2)
-  x <- rmvnorm(n, sigma = sigma)
-  z1 <- rbinom(n, 1, .6)
-  z2 <- rnorm(n)
-  gam <- c(.1, -.2)
+  n <- 300
+  sigma <- matrix(.7, 4, 4)
+  diag(sigma) <- 1
+  v <- rmvnorm(n, sigma = sigma)
+  x1 <- v[, 1]
+  x2 <- v[, 2]
+  z1 <- (v[, 3] > 0) + 0
+  z2 <- v[, 4]
+  
   trt <- rbinom(n, 1, .5)
   
-  bet <- c(-.2,.2)
-  y <- -.5+x \%*\% bet + z1 * .3 - z2 * .1 + .1 * trt-.1 * rnorm(n)
-  death <- rbinom(n, 1, .8)
-  id <- 1:n
-  data.frame(
+  bet <- c(-.3,.3)
+  y <- -log(runif(n))/
+    exp(-.3 * x1 + .3 * x2 + z1 * .5 - z2 * .3 + .1 * trt + rnorm(n))
+  
+  z1[sample.int(n, 50)] <- NA
+  z2[sample.int(n, 50)] <- NA
+  x1[sample.int(n, 50)] <- NA
+  x2[sample.int(n, 50)] <- NA
+  death <- ifelse(y > 2, 0, 1)
+  y[y > 2] <- 2
+  
+  pid <- paste0('pid-', 1:n)
+  ret <- data.frame(
     y = y, trt = trt, 
     z1 = z1, z2 = z2, 
-    x1 = x[, 1], x2 = x[, 2], 
-    death, id)
-  }
-  
-  dat1 <- genData(seed = 31415926)
-  
-  ## create a dataset with repeated measurements x
-  dat2 <- dat1 \%>\% pivot_longer(c(x1, x2), names_to='tmp', values_to='x') \%>\% 
-  dplyr::select(x, trt, id) \%>\% as.data.frame()
-  
-  fit <- 
-    jointCovariance(
-    logrank_(Surv(time=y, event=death) ~ trt, data_index = 1),
-    glm_(z1 ~ trt, family = 'binomial', data_index = 1), 
-    glm_(z2 ~ trt, family = 'gaussian', data_index = 1), 
-    gee_(x ~ trt, id = 'id', 
-         family = 'gaussian', corstr = 'independence', data_index = 2), 
-    data = list(dat1, dat2))
- 
- fit
- 
- ## to use bootstrap, set (large) nboot. nboot = 100 in this example is 
- ## too small. In this example, nboot = 1000 would give pretty close mcov
- bfit <- 
-    jointCovariance(
-    logrank_(Surv(time=y, event=death) ~ trt, data_index = 1),
-    glm_(z1 ~ trt, family = 'binomial', data_index = 1), 
-    glm_(z2 ~ trt, family = 'gaussian', data_index = 1), 
-    gee_(x ~ trt, id = 'id', 
-         family = 'gaussian', corstr = 'independence', data_index = 2), 
-    data = list(dat1, dat2), nboot = 100)
- 
- bfit
- 
+    x1 = x1, x2 = x2, 
+    death, pid)
+  ret
+}
+
+dat1 <- genData()
+
+## create a dataset with repeated measurements x
+dat2 <- dat1 \%>\% pivot_longer(c(x1, x2), names_to='visit', values_to='x') \%>\% 
+  dplyr::select(x, trt, visit, pid) \%>\% as.data.frame()
+
+dat2$visit <- as.factor(dat2$visit)
+dat2$pid <- as.factor(dat2$pid)
+
+fit <- jointCovariance(
+  coxph_(Surv(time = y, event = death) ~ trt, data_index = 1),
+  logrank_(Surv(time = y, event=death) ~ trt, data_index = 1),
+  glm_(z1 ~ trt, family = 'binomial', data_index = 1), 
+  glm_(z2 ~ trt, family = 'gaussian', data_index = 1), 
+  mmrm_(x ~ trt + us(visit | pid), reml = TRUE, data_index = 2), 
+  gee_(x ~ trt, family = 'gaussian', corstr = 'independence', data_index = 2), 
+  data = list(dat1, dat2))
+
+fit
+
+
+bfit <-jointCovariance(
+  coxph_(Surv(time=y, event=death) ~ trt, data_index = 1),
+  logrank_(Surv(time=y, event=death) ~ trt, data_index = 1),
+  glm_(z1 ~ trt, family = 'binomial', data_index = 1), 
+  glm_(z2 ~ trt, family = 'gaussian', data_index = 1), 
+  mmrm_(x ~ trt + us(visit | pid), reml = TRUE, data_index = 2), 
+  gee_(x ~ trt, family = 'gaussian', corstr = 'independence', data_index = 2), 
+  data = list(dat1, dat2), nboot = 10)
+
+summary(bfit)
+
 }

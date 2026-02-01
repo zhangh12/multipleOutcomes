@@ -1,0 +1,31 @@
+#' Calculate Variance-Covariance Matrix for a Fitted Model Object
+#' @description
+#' Returns the variance-covariance matrix of the main parameters of fitted model 
+#' objects. The "main" parameters of models correspond to those returned by `coef`. 
+#' 
+#' @param object an object returned by `jointCovariance()`.
+#' @param model_index `NULL` if displaying covariance matrix of all fitted models;
+#' otherwise, an integer indicating the fitted model.
+#' @param ... for debugging only
+#'
+#' @return a matrix of covariance of all estimates
+#' @export
+#'
+vcov.jointCovariance <- function(object, model_index = NULL, ...){
+  
+  ret <- object$mcov
+  
+  if(!is.null(model_index)){
+    id_map <- object$id_map
+    if(model_index > length(id_map)){
+      stop('Invalid model index.')
+    }
+    
+    ret <- ret[id_map[[model_index]], id_map[[model_index]], drop = FALSE]
+    rownames(ret) <- names(id_map[[model_index]])
+    colnames(ret) <- names(id_map[[model_index]])
+  }
+  
+  ret
+  
+}

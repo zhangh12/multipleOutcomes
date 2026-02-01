@@ -18,7 +18,7 @@
 #' for arguments like `weights`, `subset`, etc. 
 #' 
 #' @export
-logrank_ <- function(formula, ties = c('efron', 'breslow', 'exact'), data_index = 1){
+logrank_ <- function(formula, ties = c('efron', 'breslow', 'exact'), data_index){
   
   ties <- match.arg(ties)
   
@@ -27,7 +27,8 @@ logrank_ <- function(formula, ties = c('efron', 'breslow', 'exact'), data_index 
       engine = "longrank",
       formula = formula,
       ties = ties,
-      data_index = data_index
+      data_index = data_index,
+      id_col = 'pid'
     ),
     class = c("jc_spec_logrank", "jc_spec")
   )

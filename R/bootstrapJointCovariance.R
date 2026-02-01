@@ -66,10 +66,10 @@ bootstrapJointCovariance <- function(..., data, nboot, compute_cov, seed){
   
   for(i in 1:n_models){
     idx1 <- adapters[[i]]$get_data_index()
-    n_shared_sample_sizes[i, i] <- nrow(data[[idx1]])
+    n_shared_sample_sizes[i, i] <- adapters[[i]]$get_n()
     for(j in i:n_models){
       idx2 <- adapters[[j]]$get_data_index()
-      n_shared_sample_sizes[i, j] <- intersect(rownames(data[[idx1]]), rownames(data[[idx2]])) %>% length()
+      n_shared_sample_sizes[i, j] <- intersect(adapters[[i]]$get_sample_id(), adapters[[j]]$get_sample_id()) %>% length()
       n_shared_sample_sizes[j, i] <- n_shared_sample_sizes[i, j]
     }
   }

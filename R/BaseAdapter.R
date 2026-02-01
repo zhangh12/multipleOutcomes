@@ -12,6 +12,8 @@ BaseAdapter <- R6::R6Class(
     estimate = NULL,
     score = NULL,
     inv_hess = NULL,
+    n = NULL,
+    sample_id = NULL,
     
     initialize = function(spec, data) {
       self$spec <- spec
@@ -20,6 +22,20 @@ BaseAdapter <- R6::R6Class(
     
     fit_model = function(){
       stop("fit_model() not implemented.")
+    },
+    
+    get_n = function(){
+      if(is.null(self$n)){
+        stop('sample size is not calculated. Debug it. ')
+      }
+      self$n
+    },
+    
+    get_sample_id = function(){
+      if(is.null(self$sample_id)){
+        stop('sample ID is missing. Debug it. ')
+      }
+      self$sample_id
     },
     
     get_coef = function(){
@@ -56,11 +72,16 @@ BaseAdapter <- R6::R6Class(
       self$score
     },
     
-    get_bread = function() {
+    get_bread = function(){
       self$inv_hess
     },
     
+    get_type = function(){
+      self$type
+    },
+    
     print = function(){
+      print(self$type)
       print(self$estimate)
       print(head(self$score))
       print(self$inv_hess)

@@ -15,17 +15,17 @@ sampleWithReplacement <- function(data){
       function(idx){
         df <- data[[idx]]
         df$index <- idx
-        df[, c('id', 'index'), drop = FALSE]
+        df[, c('pid', 'index'), drop = FALSE]
       })
   uid <- do.call(rbind, uid) %>% 
-    group_by(.data$id) %>% 
+    group_by(.data$pid) %>% 
     summarise(group = paste0(paste0('data-', sort(unique(.data$index))), collapse = ','))
   
   unique_dataset_group <- sort(unique(uid$group))
   selected_uid <- list()
   for(i in seq_along(unique_dataset_group)){
     group <- unique_dataset_group[i]
-    ids <- uid$id[uid$group == group]
+    ids <- uid$pid[uid$group == group]
     selected_uid[[group]] <- sample(ids, size = length(ids), replace = TRUE)
   }
   
@@ -33,21 +33,21 @@ sampleWithReplacement <- function(data){
   for(group in names(selected_uid)){
     dat_ids <- as.integer(unlist(strsplit(gsub('data-', '', group), ',')))
     for(dat_id in dat_ids){
-      if(!any(duplicated(data[[dat_id]]$id))){
-        rownames(data[[dat_id]]) <- data[[dat_id]]$id
+      if(!any(duplicated(data[[dat_id]]$pid))){
+        rownames(data[[dat_id]]) <- data[[dat_id]]$pid
         tmp_data <- data[[dat_id]][selected_uid[[group]], , drop = FALSE]
-        tmp_data$id <- rownames(tmp_data)
+        tmp_data$pid <- rownames(tmp_data)
         bdata[[dat_id]] <- rbind(bdata[[dat_id]], tmp_data)
         rm(tmp_data)
       }else{
-        tmp <- data[[dat_id]][!duplicated(data[[dat_id]]$id), , drop = FALSE]
-        rownames(tmp) <- tmp$id
-        tmp <- tmp[selected_uid[[group]], 'id', drop = FALSE]
+        tmp <- data[[dat_id]][!duplicated(data[[dat_id]]$pid), , drop = FALSE]
+        rownames(tmp) <- tmp$pid
+        tmp <- tmp[selected_uid[[group]], 'pid', drop = FALSE]
         for(i in seq_along(selected_uid[[group]])){
           sid <- selected_uid[[group]][i]
           new_sid <- rownames(tmp)[i]
-          tmp_data <- data[[dat_id]] %>% dplyr::filter(.data$id %in% sid)
-          tmp_data$id <- new_sid
+          tmp_data <- data[[dat_id]] %>% dplyr::filter(.data$pid %in% sid)
+          tmp_data$pid <- new_sid
           bdata[[dat_id]] <- rbind(bdata[[dat_id]], tmp_data)
           rm(tmp_data, sid, new_sid)
         }

@@ -1,6 +1,6 @@
 Package: multipleOutcomes
 Title: Asymptotic Covariance Matrix of Regression Models for Multiple Outcomes
-Version: 0.12
+Version: 0.13
 Authors@R: 
     person("Han", "Zhang", , "zhangh.ustc@gmail.com", role = c("aut", "cre"))
 Description: Regression models can be fitted for multiple outcomes simultaneously. This package computes estimates of parameters across fitted models and returns the matrix of asymptotic covariance. Various applications of this package, including PATED (Prognostic Variables Assisted Treatment Effect Detection), multiple comparison adjustment, conditional power are illustrated. 
@@ -12,10 +12,12 @@ Imports:
     dplyr,
     ggplot2,
     ggpubr,
+    mmrm (>= 0.3.15),
     momentfit,
     mvtnorm,
     numDeriv,
     rlang,
+    sandwich,
     stringr,
     survival,
     tidyr,

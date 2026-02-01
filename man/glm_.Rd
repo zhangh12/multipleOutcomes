@@ -4,7 +4,7 @@
 \alias{glm_}
 \title{Creating Objects of Generalized Linear Models}
 \usage{
-glm_(formula, family, data_index = 1)
+glm_(formula, family, data_index)
 }
 \arguments{
 \item{formula}{see \code{formula} in \code{stats::glm}.}
@@ -14,6 +14,8 @@ are under testing.}
 
 \item{data_index}{integer. Index of the data frame in the \code{data} argument of
 \code{jointCovariance} to be used when fitting a generalized linear model.}
+
+\item{id_col}{character. Column name of sample IDs.}
 }
 \description{
 \code{glm_} is a wrapper function of \code{stats::glm} to create an object to be passed

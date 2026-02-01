@@ -10,6 +10,7 @@
 #' are under testing. 
 #' @param data_index integer. Index of the data frame in the `data` argument of
 #' `jointCovariance` to be used when fitting a generalized linear model. 
+#' @param id_col character. Column name of sample IDs. 
 #' 
 #' @details
 #' 
@@ -18,13 +19,14 @@
 #' for arguments like `weights`, `subset`, etc. 
 #' 
 #' @export
-glm_ <- function(formula, family, data_index = 1) {
+glm_ <- function(formula, family, data_index) {
   structure(
     list(
       engine = "glm",
       formula = formula,
       family  = family,
-      data_index = data_index
+      data_index = data_index,
+      id_col = 'pid'
     ),
     class = c("jc_spec_glm", "jc_spec")
   )

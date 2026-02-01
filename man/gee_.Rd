@@ -4,13 +4,10 @@
 \alias{gee_}
 \title{Creating Objects of Generalized Estimation Equation Model}
 \usage{
-gee_(formula, id, family, corstr, R = NULL, b = NULL, Mv = 1, data_index = 1)
+gee_(formula, family, corstr, R = NULL, b = NULL, Mv = 1, data_index)
 }
 \arguments{
 \item{formula}{see \code{formula} in \code{gee::gee}.}
-
-\item{id}{character. Column name where clusters are defined. See \code{id} and
-the Details section of \code{gee::gee}.}
 
 \item{family}{see \code{family} in \code{gee::gee}.}
 

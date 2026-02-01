@@ -10,8 +10,6 @@
 #' does not need to install the package `gee` to use this package.  
 #' 
 #' @param formula see `formula` in `gee::gee`. 
-#' @param id character. Column name where clusters are defined. See `id` and 
-#' the Details section of `gee::gee`. 
 #' @param family see `family` in `gee::gee`. 
 #' @param corstr see `corstr` in `gee::gee`. 
 #' @param R see `R` in `gee::gee`. 
@@ -27,18 +25,18 @@
 #' for arguments like `subset`, etc. 
 #' 
 #' @export
-gee_ <- function(formula, id, family, corstr, R = NULL, b = NULL, Mv = 1, data_index = 1) {
+gee_ <- function(formula, family, corstr, R = NULL, b = NULL, Mv = 1, data_index) {
   structure(
     list(
       engine = "gee",
       formula = formula,
-      id = id, 
       family  = family,
       corstr = corstr, 
       R = R, 
       b = b,
       Mv = Mv,
-      data_index = data_index
+      data_index = data_index,
+      id_col = 'pid'
     ),
     class = c("jc_spec_gee", "jc_spec")
   )
