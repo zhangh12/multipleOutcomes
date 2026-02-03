@@ -25,6 +25,10 @@ BaseAdapter <- R6::R6Class(
       stop("fit_model() not implemented.")
     },
     
+    get_engine = function(){
+      self$spec$engine
+    },
+    
     get_n = function(){
       if(is.null(self$n)){
         stop('sample size is not calculated. Debug it. ')

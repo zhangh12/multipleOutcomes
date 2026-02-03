@@ -18,6 +18,12 @@ asymptoticJointCovariance <- function(..., data){
   df <- NULL
   vars <- vector('list', n_models)
   for(i in 1:n_models){
+    engine <- adapters[[i]]$get_engine()
+    if(engine %in% 'km'){
+      stop('Model ', i, ' cannot be "km_" with nboot = 0. ', 
+           'You may also want to set compute_cov = FALSE to use km_ in ... ', 
+           ' of jointCovariance. ')
+    }
     fit <- adapters[[i]]$get_coef()
     names(fit) <- paste0('model_', i, '_', names(fit))
     bet <- c(bet, fit)

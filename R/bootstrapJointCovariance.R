@@ -14,6 +14,17 @@ bootstrapJointCovariance <- function(..., data, nboot, compute_cov, seed){
   adapters <- lapply(specs, make_adapter, data_list = data)
   adapters <- lapply(adapters, function(ad){ ad$fit_model(); ad })
   
+  for(ad in adapters){
+    if(ad$get_engine() %in% 'km'){
+      if(compute_cov){
+        compute_cov <- FALSE
+        message('compute_cov is set to FALSE as km_ is in use. ', 
+                'You can compute the covariance matrix using $bootstrap_estimate. ')
+      }
+      break
+    }
+  }
+  
   n_models <- length(adapters)
   bet <- NULL
   df <- NULL
