@@ -10,7 +10,6 @@
 #' are under testing. 
 #' @param data_index integer. Index of the data frame in the `data` argument of
 #' `jointCovariance` to be used when fitting a generalized linear model. 
-#' @param id_col character. Column name of sample IDs. 
 #' 
 #' @details
 #' 

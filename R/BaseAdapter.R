@@ -7,6 +7,7 @@ BaseAdapter <- R6::R6Class(
     spec = NULL, ## passed through ... in jointCovariance
     data = NULL,
     fit  = NULL,
+    km_times = NULL, ## only for engine "km"
     
     # Standardized parameter vector ("beta") per engine
     estimate = NULL,
@@ -29,6 +30,10 @@ BaseAdapter <- R6::R6Class(
         stop('sample size is not calculated. Debug it. ')
       }
       self$n
+    },
+    
+    get_km_times = function(){
+      self$km_times
     },
     
     get_sample_id = function(){
