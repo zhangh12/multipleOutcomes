@@ -4,7 +4,7 @@
 \alias{gee_}
 \title{Creating Objects of Generalized Estimation Equation Model}
 \usage{
-gee_(formula, family, corstr, R = NULL, b = NULL, Mv = 1, data_index)
+gee_(formula, family, corstr, R = NULL, b = NULL, Mv = 1, data_index = 1)
 }
 \arguments{
 \item{formula}{see \code{formula} in \code{gee::gee}.}

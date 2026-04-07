@@ -78,8 +78,7 @@
 #'     z1 ~ trt, 
 #'     z2 ~ trt, 
 #'     x ~ trt, 
-#'     family=c('logrank', 'binomial', 'gaussian', 'gee+id+gaussian'), 
-#'     data=list(dat1, dat2), data_index = c(1, 1, 1, 2))
+#'     data=list(dat1, dat2))
 #' 
 #' fit
 #' 
@@ -87,19 +86,15 @@ pated <-
   function(
     ..., 
     data, 
-    family = NULL, 
-    data_index = NULL, 
     nboot = 0, 
     compute_cov = TRUE, 
     seed = NULL, 
     transform = 'identity'){
     
   fit <- 
-    multipleOutcomes(
+    jointCovariance(
       ..., 
       data = data, 
-      family = family, 
-      data_index = data_index,
       nboot = nboot, 
       compute_cov = compute_cov, 
       seed = seed)
@@ -109,7 +104,7 @@ pated <-
   }else{
     fml <- parseTreatmentVariableFromFormula(...)
   }
-
+  
   #id <- sapply(1:length(fit$id_map), function(i) fit$id_map[[i]][fml$arm[i]])
   id <- 
     lapply(

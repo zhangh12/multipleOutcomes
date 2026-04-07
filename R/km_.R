@@ -6,8 +6,12 @@
 #' argument `...`. The object defines how a Kaplan-Meier curve would be fitted. 
 #' 
 #' @param formula a formula created by `survival::Surv()`. 
-#' @param conf.type character. Type of confidence interval. It must be one of 
-#' `"log"`, `"log-log"`, `"plain"`, `"logit"`, or `"arcsin`. 
+#' @param times numeric vector of time. Survival probabilities at `times` are 
+#' computed (with g-transformation defined by `conf_type`). 
+#' @param conf_type character. Type of confidence interval. It must be one of 
+#' `"log"`, `"log-log"`, `"plain"`, `"logit"`, or `"arcsin"`. 
+#' @param data_index integer. Index of the data frame in the `data` argument of
+#' `jointCovariance` to be used when fitting a generalized linear model. 
 #' 
 #' @details
 #' 
@@ -21,7 +25,7 @@
 #' models.  
 #' 
 #' @export
-km_ <- function(formula, conf_type, data_index){
+km_ <- function(formula, times = NULL, conf_type, data_index = 1){
   
   if(!(conf_type %in% c('log','log-log','plain', 'logit', 'arcsin'))){
     stop("conf.type takes value from 'log','log-log','plain', 'logit', 'arcsin'")
@@ -31,6 +35,7 @@ km_ <- function(formula, conf_type, data_index){
     list(
       engine = "km",
       formula = formula, 
+      times = times, 
       conf_type = conf_type,
       data_index = data_index,
       id_col = 'pid'

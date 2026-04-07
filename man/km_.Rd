@@ -4,13 +4,19 @@
 \alias{km_}
 \title{Creating Objects of Kaplan-Meier Curve}
 \usage{
-km_(formula, conf_type, data_index)
+km_(formula, times = NULL, conf_type, data_index = 1)
 }
 \arguments{
 \item{formula}{a formula created by \code{survival::Surv()}.}
 
-\item{conf.type}{character. Type of confidence interval. It must be one of
-\code{"log"}, \code{"log-log"}, \code{"plain"}, \code{"logit"}, or \verb{"arcsin}.}
+\item{times}{numeric vector of time. Survival probabilities at \code{times} are
+computed (with g-transformation defined by \code{conf_type}).}
+
+\item{conf_type}{character. Type of confidence interval. It must be one of
+\code{"log"}, \code{"log-log"}, \code{"plain"}, \code{"logit"}, or \code{"arcsin"}.}
+
+\item{data_index}{integer. Index of the data frame in the \code{data} argument of
+\code{jointCovariance} to be used when fitting a generalized linear model.}
 }
 \description{
 \code{km_} is a wrapper function creating an object of Kaplan-Meier curve to be

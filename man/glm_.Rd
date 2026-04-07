@@ -4,7 +4,7 @@
 \alias{glm_}
 \title{Creating Objects of Generalized Linear Models}
 \usage{
-glm_(formula, family, data_index)
+glm_(formula, family, data_index = 1)
 }
 \arguments{
 \item{formula}{see \code{formula} in \code{stats::glm}.}

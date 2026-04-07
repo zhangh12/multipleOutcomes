@@ -7,8 +7,6 @@
 pated(
   ...,
   data,
-  family = NULL,
-  data_index = NULL,
   nboot = 0,
   compute_cov = TRUE,
   seed = NULL,
@@ -26,14 +24,6 @@ are treated as sample IDs. Consequently, for any two records in different
 data frames that correspond to the same sample, their row names should be
 consistent.}
 
-\item{family}{a character vector of families to be used in the models.
-All families supported by \code{multipleOutcomes} are also supported by \code{pated}.
-\code{family} can be of length 1 if all models are fitted in the same family;
-otherwise family should be specified for each of the models in \code{...}.}
-
-\item{data_index}{\code{NULL} if \code{data} is a data frame; otherwise, a vector in
-integer specifying mapping a model in \code{...} to a data frame in \code{data} (a list).}
-
 \item{nboot}{non-zero integer if bootstrap is adopted. By default 0.}
 
 \item{compute_cov}{logic. If \code{TRUE}, empirical covariance matrix is computed
@@ -44,6 +34,14 @@ matrix is computed.}
 \item{seed}{random seed when generate bootstrap data.}
 
 \item{transform}{character. Now only supports \code{"identity"}.}
+
+\item{family}{a character vector of families to be used in the models.
+All families supported by \code{multipleOutcomes} are also supported by \code{pated}.
+\code{family} can be of length 1 if all models are fitted in the same family;
+otherwise family should be specified for each of the models in \code{...}.}
+
+\item{data_index}{\code{NULL} if \code{data} is a data frame; otherwise, a vector in
+integer specifying mapping a model in \code{...} to a data frame in \code{data} (a list).}
 }
 \value{
 a data frame of testing results.
@@ -95,8 +93,7 @@ fit <-
     z1 ~ trt, 
     z2 ~ trt, 
     x ~ trt, 
-    family=c('logrank', 'binomial', 'gaussian', 'gee+id+gaussian'), 
-    data=list(dat1, dat2), data_index = c(1, 1, 1, 2))
+    data=list(dat1, dat2))
 
 fit
 

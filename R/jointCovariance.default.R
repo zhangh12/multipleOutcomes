@@ -3,11 +3,15 @@
 jointCovariance.default <- function(..., data, nboot = 0, compute_cov = TRUE, seed = NULL){
   
   stopifnot(is.list(data))
+  if(is.data.frame(data)){
+    data <- list(data)
+  }
   for(i in 1:length(data)){
     stopifnot(is.data.frame(data[[i]]))
     if(!('pid' %in% names(data[[i]]))){
       stop('data[[', i, ']] does not consist of a column pid for subject IDs. ')
     }
+    data[[i]]$pid <- paste0('PID-', data[[i]]$pid)
   }
   
   if(nboot > 0){

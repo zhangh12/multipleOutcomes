@@ -27,7 +27,7 @@
 #' @export
 mmrm_ <- function(formula, covariance = NULL, reml = TRUE, 
                   control = mmrm::mmrm_control(...), ..., 
-                  data_index){
+                  data_index = 1){
   
   if(!missing(control) && length(list(...)) > 0){
     stop('Fine-grained control can be specified either via ... or via control, 

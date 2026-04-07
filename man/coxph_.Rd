@@ -4,7 +4,7 @@
 \alias{coxph_}
 \title{Creating Objects of Proportional Hazards Regression Model}
 \usage{
-coxph_(formula, data_index)
+coxph_(formula, data_index = 1)
 }
 \arguments{
 \item{formula}{see \code{formula} in \code{survival::coxph}.}

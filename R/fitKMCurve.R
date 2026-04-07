@@ -2,9 +2,12 @@
 
 fitKMCurve <- function(formula, data, conf_type, times = NULL){
   
-  fit <- survival::survfit(formula, data = data, 
-                           type = 'kaplan-meier', se.fit = FALSE, 
-                           conf.type = 'none')
+  tr <- try(fit <- survival::survfit(formula, data = data, 
+                                     type = 'kaplan-meier', se.fit = FALSE, 
+                                     conf.type = 'none'))
+  if('try-error' %in% class(tr)){
+    stop('Unable to fit K-M curve. ')
+  }
   
   if(is.null(times)){
     times <- sort(unique(fit$time))
@@ -37,3 +40,4 @@ fitKMCurve <- function(formula, data, conf_type, times = NULL){
   trans_St
   
 }
+

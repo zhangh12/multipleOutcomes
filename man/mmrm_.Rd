@@ -10,7 +10,7 @@ mmrm_(
   reml = TRUE,
   control = mmrm::mmrm_control(...),
   ...,
-  data_index
+  data_index = 1
 )
 }
 \arguments{

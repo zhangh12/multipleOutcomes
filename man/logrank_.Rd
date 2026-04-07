@@ -4,7 +4,7 @@
 \alias{logrank_}
 \title{Creating Objects of Logrank Test}
 \usage{
-logrank_(formula, ties = c("efron", "breslow", "exact"), data_index)
+logrank_(formula, ties = c("efron", "breslow", "exact"), data_index = 1)
 }
 \arguments{
 \item{formula}{see \code{formula} in \code{survival::coxph}.}

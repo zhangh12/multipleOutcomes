@@ -7,7 +7,7 @@ KMAdapter <- R6::R6Class(
       
       self$type <- 'km'
       
-      self$fit <- fitKMCurve(self$spec$formula, self$data, self$spec$conf_type)
+      self$fit <- fitKMCurve(self$spec$formula, self$data, self$spec$conf_type, self$spec$times)
       
       ## estimate
       self$n <- nrow(self$data)
@@ -16,7 +16,6 @@ KMAdapter <- R6::R6Class(
       attributes(self$fit) <- NULL
       self$estimate <- self$fit
       
-      
       invisible(self)
     },
     
@@ -24,6 +23,7 @@ KMAdapter <- R6::R6Class(
       
       bfit <- fitKMCurve(self$spec$formula, bdata, self$spec$conf_type, 
                          times = self$get_km_times())
+      
       bfit
     }
     

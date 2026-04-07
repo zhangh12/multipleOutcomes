@@ -25,7 +25,7 @@
 #' for arguments like `subset`, etc. 
 #' 
 #' @export
-gee_ <- function(formula, family, corstr, R = NULL, b = NULL, Mv = 1, data_index) {
+gee_ <- function(formula, family, corstr, R = NULL, b = NULL, Mv = 1, data_index = 1) {
   structure(
     list(
       engine = "gee",

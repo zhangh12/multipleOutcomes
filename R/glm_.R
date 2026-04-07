@@ -18,11 +18,17 @@
 #' for arguments like `weights`, `subset`, etc. 
 #' 
 #' @export
-glm_ <- function(formula, family, data_index) {
+glm_ <- function(formula, family, data_index = 1) {
+  
+  if(!inherits(formula, 'formula')){
+    stop('"formula" in glm_ must be a R formula. ')
+  }
+  
   structure(
     list(
       engine = "glm",
       formula = formula,
+      outcome = trimws(sub("\\s*~.*", "", deparse1(formula))),
       family  = family,
       data_index = data_index,
       id_col = 'pid'

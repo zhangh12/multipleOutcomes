@@ -18,7 +18,7 @@
 #' for arguments like `weights`, `subset`, etc. 
 #' 
 #' @export
-logrank_ <- function(formula, ties = c('efron', 'breslow', 'exact'), data_index){
+logrank_ <- function(formula, ties = c('efron', 'breslow', 'exact'), data_index = 1){
   
   ties <- match.arg(ties)
   

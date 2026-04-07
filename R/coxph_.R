@@ -17,7 +17,7 @@
 #' for arguments like `weights`, `subset`, etc. 
 #' 
 #' @export
-coxph_ <- function(formula, data_index) {
+coxph_ <- function(formula, data_index = 1) {
   structure(
     list(
       engine = "coxph",
