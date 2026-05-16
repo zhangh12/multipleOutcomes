@@ -83,6 +83,29 @@ test_that("jointCovariance() rejects data_index that exceeds length(data)", {
 })
 
 # ---------------------------------------------------------------------------
+test_that("multi-data-frame setup passes validation", {
+  set.seed(3)
+  n <- 60
+  # Two data frames keyed on a shared `pid` column, both passing the bounds
+  # check and the pid-presence check. data_index = 2 on the auxiliary glm is
+  # the case validate_data_index/bounds-check should accept.
+  d1 <- data.frame(pid = paste0("p", seq_len(n)),
+                   arm = rbinom(n, 1, 0.5), y = rnorm(n))
+  d2 <- data.frame(pid = paste0("p", seq_len(n)),
+                   arm = rbinom(n, 1, 0.5), z = rnorm(n))
+  fit <- jointCovariance(
+    glm_(y ~ arm, family = "gaussian", data_index = 1),
+    glm_(z ~ arm, family = "gaussian", data_index = 2),
+    data = list(d1, d2)
+  )
+  expect_s3_class(fit, "jointCovariance")
+  expect_equal(length(fit$id_map), 2L)
+  expect_equal(dim(fit$n_shared_sample_sizes), c(2L, 2L))
+  # Both rows of pids match exactly, so the cross-block share count == n.
+  expect_equal(fit$n_shared_sample_sizes[1, 2], n)
+})
+
+# ---------------------------------------------------------------------------
 test_that("default data_index = 1 still works (no explicit arg)", {
   set.seed(2)
   n <- 50
