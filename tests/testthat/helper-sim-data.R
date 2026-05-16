@@ -122,20 +122,27 @@ sim_repeated <- function(n_subj = 120,
                          n_visits = 3,
                          beta_arm = 0.30,
                          beta_visit = 0.10,
+                         beta_z = 0.50,
                          rho = 0.5,
                          sigma = 1,
                          seed = NULL) {
   if (!is.null(seed)) set.seed(seed)
   arm <- rbinom(n_subj, 1, 0.5)
+  # `z` is a per-subject prognostic baseline, sampled independently of arm.
+  # Including it lets the longitudinal smoke tests pair the longitudinal
+  # primary model with an arm-independent glm_(z ~ arm) prognostic — the
+  # assumption PATED actually relies on for valid inference.
+  z <- rnorm(n_subj)
   Sigma <- sigma^2 * rho^abs(outer(seq_len(n_visits), seq_len(n_visits), "-"))
   e <- mvtnorm::rmvnorm(n_subj, sigma = Sigma)
   visit_offset <- beta_visit * (seq_len(n_visits) - 1)
-  y <- outer(beta_arm * arm, rep(1, n_visits)) +
+  y <- outer(beta_arm * arm + beta_z * z, rep(1, n_visits)) +
        matrix(visit_offset, n_subj, n_visits, byrow = TRUE) + e
   long <- data.frame(
     pid   = rep(paste0("p", seq_len(n_subj)), each = n_visits),
     visit = factor(rep(seq_len(n_visits), times = n_subj)),
     arm   = rep(arm, each = n_visits),
+    z     = rep(z, each = n_visits),
     y     = as.vector(t(y))
   )
   long

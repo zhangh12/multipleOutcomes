@@ -103,19 +103,22 @@ test_that("logrank_ works through jointCovariance + pated", {
 # ---------------------------------------------------------------------------
 test_that("gee_ works through jointCovariance + pated", {
   long <- sim_repeated(n_subj = 120, n_visits = 3, seed = 5)
-  # Aux glm_ has one row per subject; reduce to a single observation per pid.
-  aux <- aggregate(y ~ pid + arm, data = long, FUN = mean)
+  # One row per subject for the auxiliary glm. `z` is a baseline covariate
+  # generated independently of arm by sim_repeated(); using it (rather than
+  # an aggregate of `y`) keeps the prognostic arm-independent, which is the
+  # assumption PATED needs for valid inference.
+  aux <- long[!duplicated(long$pid), c("pid", "arm", "z")]
 
   jc <- jointCovariance(
     gee_(y ~ arm, family = "gaussian", corstr = "exchangeable", data_index = 1),
-    glm_(y ~ arm, family = "gaussian", data_index = 2),
+    glm_(z ~ arm, family = "gaussian", data_index = 2),
     data = list(long, aux)
   )
   expect_well_formed_jc(jc, expected_models = 2)
 
   pa <- pated(
     gee_(y ~ arm, family = "gaussian", corstr = "exchangeable", data_index = 1),
-    glm_(y ~ arm, family = "gaussian", data_index = 2),
+    glm_(z ~ arm, family = "gaussian", data_index = 2),
     data = list(long, aux)
   )
   expect_well_formed_pated(pa)
@@ -163,18 +166,18 @@ test_that("quantile_ errors with nboot = 0 (no closed-form score)", {
 test_that("mmrm_ works through jointCovariance + pated", {
   skip_if_not_installed("mmrm")
   long <- sim_repeated(n_subj = 120, n_visits = 3, seed = 6)
-  aux  <- aggregate(y ~ pid + arm, data = long, FUN = mean)
+  aux  <- long[!duplicated(long$pid), c("pid", "arm", "z")]
 
   jc <- jointCovariance(
     mmrm_(y ~ arm + us(visit | pid), reml = TRUE, data_index = 1),
-    glm_(y ~ arm, family = "gaussian", data_index = 2),
+    glm_(z ~ arm, family = "gaussian", data_index = 2),
     data = list(long, aux)
   )
   expect_well_formed_jc(jc, expected_models = 2)
 
   pa <- pated(
     mmrm_(y ~ arm + us(visit | pid), reml = TRUE, data_index = 1),
-    glm_(y ~ arm, family = "gaussian", data_index = 2),
+    glm_(z ~ arm, family = "gaussian", data_index = 2),
     data = list(long, aux)
   )
   expect_well_formed_pated(pa)
