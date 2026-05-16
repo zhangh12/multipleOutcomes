@@ -24,6 +24,7 @@ for further analysis."></head><body>
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/test.html">test</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/zhangh12/multipleOutcomes/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -160,32 +161,32 @@ being used to fit the models.</td></tr><tr><td></td><td></td></tr><tr><td><code>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">fit</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $coefficients</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.114763782  0.914043662  0.115831816  0.149275931  0.023516965</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6]  0.021534389 -0.003481828  0.001985450 -0.003313751  0.017943711</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.08039782  0.62944355 -0.08576682  0.12213447  0.01835858 -0.13334461</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.10139381  0.07958077 -0.11501843  0.09952479</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $mcov</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                [,1]         [,2]         [,3]         [,4]          [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  0.0156726071  0.124327714 -0.003014050  0.004357725  0.0005758461</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  0.1243277142  0.986761945 -0.023383177  0.034304612  0.0044622517</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.0030140503 -0.023383177  0.033168860 -0.033168860  0.0068153253</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.0043577250  0.034304612 -0.033168860  0.064724633 -0.0068602365</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  0.0005758461  0.004462252  0.006815325 -0.006860237  0.0082001306</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -0.0015769265 -0.012644988 -0.006816356  0.013485374 -0.0082001306</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  0.0004390852  0.003433940  0.007036984 -0.007034904  0.0044847682</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -0.0013210131 -0.010538376 -0.007031246  0.014564401 -0.0044858539</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  0.0003918193  0.003066510  0.007340231 -0.007338907  0.0046176712</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -0.0010072901 -0.008020632 -0.007335540  0.014886949 -0.0046187440</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                [,1]          [,2]          [,3]          [,4]          [,5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  1.628603e-02  0.1271629079 -0.0007228741 -0.0008734002 -0.0001894825</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  1.271629e-01  0.9932305284 -0.0055457811 -0.0069150434 -0.0014489303</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -7.228741e-04 -0.0055457811  0.0286240033 -0.0286240033  0.0068056583</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -8.734002e-04 -0.0069150434 -0.0286240033  0.0649996646 -0.0068065664</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -1.894825e-04 -0.0014489303  0.0068056583 -0.0068065664  0.0073034875</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] -9.986200e-04 -0.0078196721 -0.0068075499  0.0145952533 -0.0073034875</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  2.033393e-05  0.0001841844  0.0060216482 -0.0060231700  0.0037944215</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] -1.512654e-03 -0.0119679927 -0.0060245885  0.0144993273 -0.0037952913</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  2.191215e-04  0.0017086509  0.0062594111 -0.0062624769  0.0038670068</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] -1.780559e-03 -0.0140345175 -0.0062626590  0.0146283417 -0.0038678634</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               [,6]          [,7]         [,8]          [,9]        [,10]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.001576927  0.0004390852 -0.001321013  0.0003918193 -0.001007290</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.012644988  0.0034339395 -0.010538376  0.0030665098 -0.008020632</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.006816356  0.0070369845 -0.007031246  0.0073402310 -0.007335540</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.013485374 -0.0070349035  0.014564401 -0.0073389075  0.014886949</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.008200131  0.0044847682 -0.004485854  0.0046176712 -0.004618744</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  0.016100349 -0.0044847598  0.008697018 -0.0046176637  0.008521276</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.004484760  0.0055767924 -0.005576792  0.0056994503 -0.005699450</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  0.008697018 -0.0055767924  0.012048242 -0.0056994503  0.011963294</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.004617664  0.0056994503 -0.005699450  0.0060864245 -0.006086424</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  0.008521276 -0.0056994503  0.011963294 -0.0060864245  0.012461240</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] -0.000998620  2.033393e-05 -0.001512654  0.0002191215 -0.001780559</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] -0.007819672  1.841844e-04 -0.011967993  0.0017086509 -0.014034517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -0.006807550  6.021648e-03 -0.006024589  0.0062594111 -0.006262659</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  0.014595253 -6.023170e-03  0.014499327 -0.0062624769  0.014628342</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -0.007303487  3.794422e-03 -0.003795291  0.0038670068 -0.003867863</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  0.015526405 -3.793520e-03  0.008600338 -0.0038659095  0.008643580</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] -0.003793520  4.973808e-03 -0.004973808  0.0049875186 -0.004987519</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  0.008600338 -4.973808e-03  0.010737295 -0.0049875186  0.010653161</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] -0.003865910  4.987519e-03 -0.004987519  0.0052224187 -0.005222419</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  0.008643580 -4.987519e-03  0.010653161 -0.0052224187  0.011025692</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $id_map</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $id_map[[1]]</span>
@@ -215,12 +216,12 @@ being used to fit the models.</td></tr><tr><td></td><td></td></tr><tr><td><code>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $n_shared_sample_sizes</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2] [,3] [,4] [,5] [,6]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  300  300  250  250  291  291</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  300  300  250  250  291  291</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  250  250  250  212  243  243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  250  250  212  250  243  243</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  291  291  243  243  291  291</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [6,]  291  291  243  243  291  291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  300  300  250  250  290  290</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  300  300  250  250  290  290</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  250  250  250  205  241  241</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,]  250  250  205  250  243  243</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,]  290  290  241  243  290  290</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6,]  290  290  241  243  290  290</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $call</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> jointCovariance.default(coxph_(Surv(time = y, event = death) ~ </span>
@@ -257,17 +258,17 @@ being used to fit the models.</td></tr><tr><td></td><td></td></tr><tr><td><code>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         data_index = 2), data = list(dat1, dat2), nboot = 10)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       Estimate Std. Error z value Pr(&gt;|z|)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_1_trt          0.1147638  0.1588465  0.7225   0.4700</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_2_trt          0.9140437  1.2648107  0.7227   0.4699</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_3_(Intercept)  0.1158318  0.1503387  0.7705   0.4410</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_3_trt          0.1492759  0.2911496  0.5127   0.6082</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_4_(Intercept)  0.0235170  0.1031410  0.2280   0.8196</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_4_trt          0.0215344  0.1171998  0.1837   0.8542</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_5_(Intercept) -0.0034818  0.0689771 -0.0505   0.9597</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_5_trt          0.0019855  0.0996949  0.0199   0.9841</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_6_(Intercept) -0.0033138  0.0603111 -0.0549   0.9562</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> model_6_trt          0.0179437  0.0843368  0.2128   0.8315</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                      Estimate Std. Error z value Pr(&gt;|z|)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_1_trt          0.080398   0.157792  0.5095   0.6104</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_2_trt          0.629444   1.236528  0.5090   0.6107</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_3_(Intercept) -0.085767   0.143246 -0.5987   0.5493</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_3_trt          0.122134   0.255381  0.4782   0.6325</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_4_(Intercept)  0.018359   0.097943  0.1874   0.8513</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_4_trt         -0.133345   0.144983 -0.9197   0.3577</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_5_(Intercept) -0.101394   0.078402 -1.2932   0.1959</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_5_trt          0.079581   0.112492  0.7074   0.4793</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_6_(Intercept) -0.115018   0.086736 -1.3261   0.1848</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> model_6_trt          0.099525   0.115582  0.8611   0.3892</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## km_() and quantile_() require nboot &gt; 0 because they have no</span></span></span>
 <span class="r-in"><span><span class="co">## closed-form score. compute_cov is forced to FALSE for km_().</span></span></span>
