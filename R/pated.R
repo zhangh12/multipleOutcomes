@@ -1,10 +1,10 @@
 #' Prognostic Variables Assisted Treatment Effect Detection
 #' @description
-#' `pated` is a wrapper function of `multipleOutcomes` for testing treatment effect 
-#' in randomized clinical trials. It assumes that prognostic variables are fully 
-#' randomized. This assumption can help enhancing statistical power of conventional 
-#' approaches in detecting the treatment effect. Specifically, the sensitivity 
-#' of the conventional models specified in `...` are improved by `pated`. 
+#' `pated` is a wrapper function of `jointCovariance` for testing treatment effect
+#' in randomized clinical trials. It assumes that prognostic variables are fully
+#' randomized. This assumption can help enhancing statistical power of conventional
+#' approaches in detecting the treatment effect. Specifically, the sensitivity
+#' of the conventional models specified in `...` are improved by `pated`.
 #' 
 #' @importFrom stringr str_extract
 #' @importFrom ggpubr ggarrange
@@ -13,20 +13,13 @@
 #' @importFrom ggplot2 geom_hline geom_vline scale_color_manual theme element_blank
 #' @importFrom rlang .data
 #' 
-#' @param ... formulas of models to be fitted, or moment functions for gmm. 
-#' @param family a character vector of families to be used in the models.
-#' All families supported by `multipleOutcomes` are also supported by `pated`. 
-#' `family` can be of length 1 if all models are fitted in the same family; 
-#' otherwise family should be specified for each of the models in `...`.
-#' @param data a data frame if all models are fitted on the same dataset;
-#' otherwise a list of data frames for fitting models in `...`. Note that a
-#' dataset can be used to fit multiple models, thus, `length(data)` is unnecessary
-#' to be equal to the number of models in `...`. The row names in a data frame
-#' are treated as sample IDs. Consequently, for any two records in different
-#' data frames that correspond to the same sample, their row names should be
-#' consistent.
-#' @param data_index `NULL` if `data` is a data frame; otherwise, a vector in
-#' integer specifying mapping a model in `...` to a data frame in `data` (a list).
+#' @param ... model specifications built by `glm_()`, `coxph_()`, `logrank_()`,
+#' `gee_()`, `mmrm_()`, `km_()`, or `quantile_()`. The first specification is
+#' the primary outcome whose treatment effect is being tested; the rest are
+#' prognostic covariates used to tighten the SE.
+#' @param data a list of data frames, one per `data_index`. Each data frame
+#' must have a `pid` column carrying subject identifiers; records with the
+#' same `pid` across different data frames refer to the same subject.
 #' @param nboot non-zero integer if bootstrap is adopted. By default 0.
 #' @param compute_cov logic. If \code{TRUE}, empirical covariance matrix is computed 
 #' using bootstrap estimate and returned. Bootstrap estimate will be abandoned. If 
@@ -149,7 +142,7 @@ pated <-
       corr = NA
     )
 
-  family <- sub('_$', '', sub('MO$', '', fml$func))
+  family <- sub('_$', '', fml$func)
   family <- c(rep(family[1], length(id1)), rep(family[-1], times = fml$n_terms[-1]))
   
   nonconfounder <-

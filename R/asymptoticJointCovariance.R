@@ -19,10 +19,9 @@ asymptoticJointCovariance <- function(..., data){
   vars <- vector('list', n_models)
   for(i in 1:n_models){
     engine <- adapters[[i]]$get_engine()
-    if(engine %in% 'km'){
-      stop('Model ', i, ' cannot be "km_" with nboot = 0. ', 
-           'You may also want to set compute_cov = FALSE to use km_ in ... ', 
-           ' of jointCovariance. ')
+    if(engine %in% c('km', 'quantile')){
+      stop('Model ', i, ' uses engine "', engine, '_" which has no closed-form score. ',
+           'Re-fit with nboot > 0 to use the bootstrap path.')
     }
     fit <- adapters[[i]]$get_coef()
     names(fit) <- paste0('model_', i, '_', names(fit))

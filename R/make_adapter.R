@@ -31,6 +31,10 @@ make_adapter <- function(spec, data_list){
   if(inherits(spec, "jc_spec_km")){
     return(KMAdapter$new(spec, dat))
   }
-  
+
+  if(inherits(spec, "jc_spec_quantile")){
+    return(QuantileAdapter$new(spec, dat))
+  }
+
   stop("Unsupported spec type: ", paste(class(spec), collapse = ", "))
 }

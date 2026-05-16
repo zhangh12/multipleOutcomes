@@ -122,6 +122,44 @@ test_that("gee_ works through jointCovariance + pated", {
 })
 
 # ---------------------------------------------------------------------------
+test_that("quantile_ works through jointCovariance + pated (bootstrap)", {
+  dat <- sim_gaussian(n = 200, seed = 7)
+  jc <- jointCovariance(
+    quantile_(y ~ arm, probs = c(.25, .5, .75), data_index = 1),
+    glm_(z ~ arm, family = "gaussian", data_index = 1),
+    data = list(dat),
+    nboot = 30,
+    seed  = 11
+  )
+  expect_s3_class(jc, "jointCovariance")
+  # quantile_ contributes 3 parameters (one per probability)
+  expect_equal(length(jc$id_map[[1]]), 3L)
+  expect_true(all(grepl("^arm_\\d+%$", names(jc$id_map[[1]]))))
+  expect_true(all(is.finite(coef(jc))))
+  V <- vcov(jc); expect_true(is.matrix(V)); expect_lt(max(abs(V - t(V))), 1e-8)
+
+  pa <- pated(
+    quantile_(y ~ arm, probs = c(.25, .5, .75), data_index = 1),
+    glm_(z ~ arm, family = "gaussian", data_index = 1),
+    data  = list(dat),
+    nboot = 30,
+    seed  = 11
+  )
+  expect_well_formed_pated(pa)
+})
+
+test_that("quantile_ errors with nboot = 0 (no closed-form score)", {
+  dat <- sim_gaussian(n = 100, seed = 8)
+  expect_error(
+    jointCovariance(
+      quantile_(y ~ arm, probs = c(.25, .5, .75), data_index = 1),
+      data = list(dat)
+    ),
+    regexp = "no closed-form score"
+  )
+})
+
+# ---------------------------------------------------------------------------
 test_that("mmrm_ works through jointCovariance + pated", {
   skip_if_not_installed("mmrm")
   long <- sim_repeated(n_subj = 120, n_visits = 3, seed = 6)

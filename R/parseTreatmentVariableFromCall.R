@@ -60,9 +60,9 @@ parseTreatmentVariableFromCall <- function(...){
       arg[idx] <- as.character(cstr$conf_type)
     }
 
-    if (func[idx] == 'quantileMO') {
+    if (func[idx] == 'quantile_') {
       if (is.null(cstr$probs)) {
-        stop('probs is missing in quantileMO')
+        stop('probs is missing in quantile_')
       }
       arg[idx] <- deparse(cstr$probs)
       n_terms[idx] <- length(eval(cstr$probs))
