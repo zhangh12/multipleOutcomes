@@ -26,6 +26,7 @@
 #' 
 #' @export
 gee_ <- function(formula, family, corstr, R = NULL, b = NULL, Mv = 1, data_index = 1) {
+  data_index <- validate_data_index(data_index)
   structure(
     list(
       engine = "gee",

@@ -18,6 +18,7 @@
 #' 
 #' @export
 coxph_ <- function(formula, data_index = 1) {
+  data_index <- validate_data_index(data_index)
   structure(
     list(
       engine = "coxph",

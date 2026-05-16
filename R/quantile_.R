@@ -24,6 +24,7 @@ quantile_ <- function(formula, probs = c(0.25, 0.5, 0.75), data_index = 1) {
   if (!is.numeric(probs) || any(probs <= 0 | probs >= 1)) {
     stop('"probs" must be numeric values in (0, 1).')
   }
+  data_index <- validate_data_index(data_index)
 
   structure(
     list(

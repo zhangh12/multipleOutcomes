@@ -30,7 +30,8 @@ km_ <- function(formula, times = NULL, conf_type, data_index = 1){
   if(!(conf_type %in% c('log','log-log','plain', 'logit', 'arcsin'))){
     stop("conf.type takes value from 'log','log-log','plain', 'logit', 'arcsin'")
   }
-  
+  data_index <- validate_data_index(data_index)
+
   structure(
     list(
       engine = "km",

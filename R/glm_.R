@@ -23,7 +23,8 @@ glm_ <- function(formula, family, data_index = 1) {
   if(!inherits(formula, 'formula')){
     stop('"formula" in glm_ must be a R formula. ')
   }
-  
+  data_index <- validate_data_index(data_index)
+
   structure(
     list(
       engine = "glm",

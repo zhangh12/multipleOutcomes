@@ -59,7 +59,9 @@ mmrm_ <- function(formula, covariance = NULL, reml = TRUE,
     control$vcov <- 'Empirical'
     message('vcov in mmrm_control is re-set to be "Empirical"')
   }
-  
+
+  data_index <- validate_data_index(data_index)
+
   structure(
     list(
       engine = "mmrm",

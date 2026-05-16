@@ -21,7 +21,8 @@
 logrank_ <- function(formula, ties = c('efron', 'breslow', 'exact'), data_index = 1){
   
   ties <- match.arg(ties)
-  
+  data_index <- validate_data_index(data_index)
+
   structure(
     list(
       engine = "longrank",
