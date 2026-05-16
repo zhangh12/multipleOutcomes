@@ -116,16 +116,18 @@
 #'
 #' ## km_() and quantile_() require nboot > 0 because they have no
 #' ## closed-form score. compute_cov is forced to FALSE for km_().
+#' ## When all models share one dataset, `data_index` and `list(...)`
+#' ## can be omitted.
 #' kfit <- jointCovariance(
 #'   km_(Surv(time = y, event = death) ~ trt, conf_type = 'log',
-#'       times = c(0.5, 1, 1.5), data_index = 1),
-#'   glm_(z1 ~ trt, family = 'binomial', data_index = 1),
-#'   data = list(dat1, dat2), nboot = 30, seed = 1)
+#'       times = c(0.5, 1, 1.5)),
+#'   glm_(z1 ~ trt, family = 'binomial'),
+#'   data = dat1, nboot = 30, seed = 1)
 #'
 #' qfit <- jointCovariance(
-#'   quantile_(y ~ trt, probs = c(0.25, 0.5, 0.75), data_index = 1),
-#'   glm_(z2 ~ trt, family = 'gaussian', data_index = 1),
-#'   data = list(dat1, dat2), nboot = 30, seed = 1)
+#'   quantile_(y ~ trt, probs = c(0.25, 0.5, 0.75)),
+#'   glm_(z2 ~ trt, family = 'gaussian'),
+#'   data = dat1, nboot = 30, seed = 1)
 #'
 jointCovariance <- function(..., data, nboot = 0, compute_cov = TRUE, seed = NULL){
     

@@ -7,3 +7,5 @@ vignettes
 ^README\.Rmd$
 ^data-raw$
 ^inst/examples$
+^\.positai$
+^\.claude$

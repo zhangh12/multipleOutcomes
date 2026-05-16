@@ -54,9 +54,9 @@ I simply follow the description information of the covariates in
 Here we compare PATED with unconditional logistic regression model in
 estimating the treatment effect. For each of the covariates, a
 regression model `covar ~ rx` is fitted to compute the slope coefficient
-$\hat b$. The correlation between $\hat b$ and $\hat\beta$, the
-unadjusted estimate of treatment effect (`outcome ~ rx`), are computed
-in the column `corr`.
+$\widehat b$. The correlation between $\widehat b$ and $\widehat\beta$,
+the unadjusted estimate of treatment effect (`outcome ~ rx`), are
+computed in the column `corr`.
 
 ``` r
 library(multipleOutcomes)
@@ -71,27 +71,29 @@ data(indo)
 # stamp it as a string under the conventional name.
 indo <- indo %>% mutate(pid = paste0("s-", id))
 
+# When there's only one dataset, `data_index` defaults to 1 and the
+# `list()` wrap is auto-applied, so neither needs to be spelled out.
 fit <- pated(
-  glm_(outcome      ~ rx, family = "binomial", data_index = 1),
+  glm_(outcome     ~ rx, family = "binomial"),
 
-  glm_(risk         ~ rx, family = "gaussian", data_index = 1),
-  glm_(gender       ~ rx, family = "binomial", data_index = 1),
-  glm_(sod          ~ rx, family = "binomial", data_index = 1),
-  glm_(pep          ~ rx, family = "binomial", data_index = 1),
-  glm_(recpanc      ~ rx, family = "binomial", data_index = 1),
-  glm_(psphinc      ~ rx, family = "binomial", data_index = 1),
-  glm_(precut       ~ rx, family = "binomial", data_index = 1),
-  glm_(difcan       ~ rx, family = "binomial", data_index = 1),
-  glm_(amp          ~ rx, family = "binomial", data_index = 1),
-  glm_(paninj       ~ rx, family = "binomial", data_index = 1),
-  glm_(acinar       ~ rx, family = "binomial", data_index = 1),
-  glm_(asa81        ~ rx, family = "binomial", data_index = 1),
-  glm_(asa          ~ rx, family = "binomial", data_index = 1),
-  glm_(prophystent  ~ rx, family = "binomial", data_index = 1),
-  glm_(therastent   ~ rx, family = "binomial", data_index = 1),
-  glm_(pdstent      ~ rx, family = "binomial", data_index = 1),
+  glm_(risk        ~ rx, family = "gaussian"),
+  glm_(gender      ~ rx, family = "binomial"),
+  glm_(sod         ~ rx, family = "binomial"),
+  glm_(pep         ~ rx, family = "binomial"),
+  glm_(recpanc     ~ rx, family = "binomial"),
+  glm_(psphinc     ~ rx, family = "binomial"),
+  glm_(precut      ~ rx, family = "binomial"),
+  glm_(difcan      ~ rx, family = "binomial"),
+  glm_(amp         ~ rx, family = "binomial"),
+  glm_(paninj      ~ rx, family = "binomial"),
+  glm_(acinar      ~ rx, family = "binomial"),
+  glm_(asa81       ~ rx, family = "binomial"),
+  glm_(asa         ~ rx, family = "binomial"),
+  glm_(prophystent ~ rx, family = "binomial"),
+  glm_(therastent  ~ rx, family = "binomial"),
+  glm_(pdstent     ~ rx, family = "binomial"),
 
-  data = list(indo)
+  data = indo
 )
 
 plot(fit)

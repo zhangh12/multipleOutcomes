@@ -17,9 +17,11 @@
 #' `gee_()`, `mmrm_()`, `km_()`, or `quantile_()`. The first specification is
 #' the primary outcome whose treatment effect is being tested; the rest are
 #' prognostic covariates used to tighten the SE.
-#' @param data a list of data frames, one per `data_index`. Each data frame
-#' must have a `pid` column carrying subject identifiers; records with the
-#' same `pid` across different data frames refer to the same subject.
+#' @param data either a single data frame (when all models are fitted on
+#' the same dataset) or a list of data frames (one entry per `data_index`).
+#' Each data frame must have a `pid` column carrying subject identifiers;
+#' records with the same `pid` across different data frames refer to the
+#' same subject.
 #' @param nboot non-zero integer if bootstrap is adopted. By default 0.
 #' @param compute_cov logic. If \code{TRUE}, empirical covariance matrix is computed 
 #' using bootstrap estimate and returned. Bootstrap estimate will be abandoned. If 
@@ -58,14 +60,17 @@
 #'
 #' dat <- genData(seed = 31415926)
 #'
+#' ## `data_index` defaults to 1 in every spec constructor and a single
+#' ## data.frame is auto-wrapped into a list, so neither needs spelling out
+#' ## when all models are fitted on the same dataset.
 #' fit <-
 #'   pated(
-#'     coxph_(Surv(time = y, event = death) ~ trt, data_index = 1),
-#'     glm_(z1 ~ trt, family = 'binomial',  data_index = 1),
-#'     glm_(z2 ~ trt, family = 'gaussian',  data_index = 1),
-#'     glm_(x1 ~ trt, family = 'gaussian',  data_index = 1),
-#'     glm_(x2 ~ trt, family = 'gaussian',  data_index = 1),
-#'     data = list(dat)
+#'     coxph_(Surv(time = y, event = death) ~ trt),
+#'     glm_(z1 ~ trt, family = 'binomial'),
+#'     glm_(z2 ~ trt, family = 'gaussian'),
+#'     glm_(x1 ~ trt, family = 'gaussian'),
+#'     glm_(x2 ~ trt, family = 'gaussian'),
+#'     data = dat
 #'   )
 #'
 #' fit
