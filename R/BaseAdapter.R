@@ -73,9 +73,13 @@ BaseAdapter <- R6::R6Class(
     
     # ---- stubs you will implement ----
     get_score = function(){
-      
+
       if(self$type != 'logrank'){
-        score_epsilon <- 1e-6
+        # Sanity check: at the MLE the per-subject score should average near 0.
+        # GLMs converge with epsilon = 1e-8, which leaves a score-mean of up
+        # to ~1e-5 on binomial / Poisson fits, so the threshold has to be
+        # loose enough to accommodate that without flagging a true convergence.
+        score_epsilon <- 1e-4
         stopifnot((colSums(self$score) / nrow(self$score)) %>% abs %>% max < score_epsilon)
       }
       self$score
