@@ -47,35 +47,38 @@ Here we compare PATED with unconditional logistic regression model in estimating
 
 ```{r warning = FALSE, message = FALSE}
 library(multipleOutcomes)
+library(dplyr)
 
 options(digits = 4)
 
 data(indo)
 
+# jointCovariance() and pated() need a per-row subject identifier in
+# column `pid`. The trial data already has an integer `id` — we just
+# stamp it as a string under the conventional name.
+indo <- indo %>% mutate(pid = paste0("s-", id))
+
 fit <- pated(
-  outcome ~ rx, 
-  
-  risk ~ rx, 
-  gender ~ rx, 
-  sod ~ rx, 
-  pep ~ rx,
-  recpanc ~ rx,
-  psphinc ~ rx, 
-  precut ~ rx, 
-  difcan ~ rx,  
-  amp ~ rx, 
-  paninj ~ rx, 
-  acinar ~ rx,
-  asa81 ~ rx, 
-  asa ~ rx,
-  prophystent ~ rx, 
-  therastent ~ rx, 
-  pdstent ~ rx, 
-  
-  data = indo,
-  family = c('binomial', 
-             rep('gaussian', 1), 
-             rep('binomial', 15))
+  glm_(outcome      ~ rx, family = "binomial", data_index = 1),
+
+  glm_(risk         ~ rx, family = "gaussian", data_index = 1),
+  glm_(gender       ~ rx, family = "binomial", data_index = 1),
+  glm_(sod          ~ rx, family = "binomial", data_index = 1),
+  glm_(pep          ~ rx, family = "binomial", data_index = 1),
+  glm_(recpanc      ~ rx, family = "binomial", data_index = 1),
+  glm_(psphinc      ~ rx, family = "binomial", data_index = 1),
+  glm_(precut       ~ rx, family = "binomial", data_index = 1),
+  glm_(difcan       ~ rx, family = "binomial", data_index = 1),
+  glm_(amp          ~ rx, family = "binomial", data_index = 1),
+  glm_(paninj       ~ rx, family = "binomial", data_index = 1),
+  glm_(acinar       ~ rx, family = "binomial", data_index = 1),
+  glm_(asa81        ~ rx, family = "binomial", data_index = 1),
+  glm_(asa          ~ rx, family = "binomial", data_index = 1),
+  glm_(prophystent  ~ rx, family = "binomial", data_index = 1),
+  glm_(therastent   ~ rx, family = "binomial", data_index = 1),
+  glm_(pdstent      ~ rx, family = "binomial", data_index = 1),
+
+  data = list(indo)
 )
 
 plot(fit)

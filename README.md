@@ -60,66 +60,69 @@ in the column `corr`.
 
 ``` r
 library(multipleOutcomes)
+library(dplyr)
 
 options(digits = 4)
 
 data(indo)
 
+# jointCovariance() and pated() need a per-row subject identifier in
+# column `pid`. The trial data already has an integer `id` — we just
+# stamp it as a string under the conventional name.
+indo <- indo %>% mutate(pid = paste0("s-", id))
+
 fit <- pated(
-  outcome ~ rx, 
-  
-  risk ~ rx, 
-  gender ~ rx, 
-  sod ~ rx, 
-  pep ~ rx,
-  recpanc ~ rx,
-  psphinc ~ rx, 
-  precut ~ rx, 
-  difcan ~ rx,  
-  amp ~ rx, 
-  paninj ~ rx, 
-  acinar ~ rx,
-  asa81 ~ rx, 
-  asa ~ rx,
-  prophystent ~ rx, 
-  therastent ~ rx, 
-  pdstent ~ rx, 
-  
-  data = indo,
-  family = c('binomial', 
-             rep('gaussian', 1), 
-             rep('binomial', 15))
+  glm_(outcome      ~ rx, family = "binomial", data_index = 1),
+
+  glm_(risk         ~ rx, family = "gaussian", data_index = 1),
+  glm_(gender       ~ rx, family = "binomial", data_index = 1),
+  glm_(sod          ~ rx, family = "binomial", data_index = 1),
+  glm_(pep          ~ rx, family = "binomial", data_index = 1),
+  glm_(recpanc      ~ rx, family = "binomial", data_index = 1),
+  glm_(psphinc      ~ rx, family = "binomial", data_index = 1),
+  glm_(precut       ~ rx, family = "binomial", data_index = 1),
+  glm_(difcan       ~ rx, family = "binomial", data_index = 1),
+  glm_(amp          ~ rx, family = "binomial", data_index = 1),
+  glm_(paninj       ~ rx, family = "binomial", data_index = 1),
+  glm_(acinar       ~ rx, family = "binomial", data_index = 1),
+  glm_(asa81        ~ rx, family = "binomial", data_index = 1),
+  glm_(asa          ~ rx, family = "binomial", data_index = 1),
+  glm_(prophystent  ~ rx, family = "binomial", data_index = 1),
+  glm_(therastent   ~ rx, family = "binomial", data_index = 1),
+  glm_(pdstent      ~ rx, family = "binomial", data_index = 1),
+
+  data = list(indo)
 )
 
 plot(fit)
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-2-1.png" alt="" width="100%" />
 
 The plot above shows that all covariates are very well balanced between
 two arms (i.e. z-values of grey points are close to zero).
 
 ``` r
 print(fit)
-#>           term   family  estimate  stderr   pvalue     method      corr
-#> 1      outcome    PATED -0.751357 0.24697 0.002348      PATED        NA
-#> 2      outcome binomial -0.705130 0.25283 0.005287   Standard  1.000000
-#> 3         risk gaussian  0.083338 0.07168 0.244984 Prognostic  0.139678
-#> 4          pep binomial -0.002142 0.22269 0.992326 Prognostic  0.126343
-#> 5          amp binomial  0.041102 0.47862 0.931565 Prognostic  0.082925
-#> 6       acinar binomial  0.275329 0.39618 0.487084 Prognostic  0.057366
-#> 7       paninj binomial -0.360946 0.27417 0.188011 Prognostic  0.053484
-#> 8   therastent binomial -0.252931 0.31591 0.423343 Prognostic -0.049425
-#> 9       difcan binomial  0.105662 0.18570 0.569368 Prognostic  0.048068
-#> 10     psphinc binomial  0.133453 0.16480 0.418059 Prognostic  0.037479
-#> 11 prophystent binomial  0.215272 0.18961 0.256226 Prognostic  0.034128
-#> 12     recpanc binomial -0.069990 0.17817 0.694454 Prognostic  0.033145
-#> 13         asa binomial -0.072330 0.27877 0.795278 Prognostic -0.024236
-#> 14         sod binomial  0.248237 0.21453 0.247228 Prognostic -0.010506
-#> 15       asa81 binomial -0.394693 0.31587 0.211467 Prognostic -0.007874
-#> 16     pdstent binomial  0.181177 0.21480 0.398967 Prognostic  0.006305
-#> 17      precut binomial -0.090072 0.36402 0.804570 Prognostic  0.005952
-#> 18      gender binomial  0.170977 0.20058 0.393994 Prognostic  0.004055
+#>           term family  estimate  stderr   pvalue     method      corr
+#> 1      outcome  PATED -0.751357 0.24697 0.002348      PATED        NA
+#> 2      outcome    glm -0.705130 0.25283 0.005287   Standard  1.000000
+#> 3         risk    glm  0.083338 0.07168 0.244984 Prognostic  0.139678
+#> 4          pep    glm -0.002142 0.22269 0.992326 Prognostic  0.126343
+#> 5          amp    glm  0.041102 0.47862 0.931565 Prognostic  0.082925
+#> 6       acinar    glm  0.275329 0.39618 0.487084 Prognostic  0.057366
+#> 7       paninj    glm -0.360946 0.27417 0.188011 Prognostic  0.053484
+#> 8   therastent    glm -0.252931 0.31591 0.423343 Prognostic -0.049425
+#> 9       difcan    glm  0.105662 0.18570 0.569368 Prognostic  0.048068
+#> 10     psphinc    glm  0.133453 0.16480 0.418059 Prognostic  0.037479
+#> 11 prophystent    glm  0.215272 0.18961 0.256226 Prognostic  0.034128
+#> 12     recpanc    glm -0.069990 0.17817 0.694454 Prognostic  0.033145
+#> 13         asa    glm -0.072330 0.27877 0.795278 Prognostic -0.024236
+#> 14         sod    glm  0.248237 0.21453 0.247228 Prognostic -0.010506
+#> 15       asa81    glm -0.394693 0.31587 0.211467 Prognostic -0.007874
+#> 16     pdstent    glm  0.181177 0.21480 0.398967 Prognostic  0.006305
+#> 17      precut    glm -0.090072 0.36402 0.804570 Prognostic  0.005952
+#> 18      gender    glm  0.170977 0.20058 0.393994 Prognostic  0.004055
 ```
 
 It is evident that PATED produces a treatment effect estimate (-0.7514)
