@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Code Coverage](https://codecov.io/gh/zhangh12/multipleOutcomes/branch/main/graph/badge.svg)](https://app.codecov.io/gh/zhangh12/multipleOutcomes)
 <!-- badges: end -->
 
 The goal of multipleOutcomes is to fit statistical models for multiple outcomes simultaneously. It computes estimates of parameters across fitted models and returns the matrix of asymptotic covariance. Various applications of this package, including PATED (Prognostic Variables Assisted Treatment Effect Detection), multiple comparison adjustment, conditional power are illustrated.

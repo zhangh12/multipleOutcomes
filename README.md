@@ -8,6 +8,8 @@
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Code
+Coverage](https://codecov.io/gh/zhangh12/multipleOutcomes/branch/main/graph/badge.svg)](https://app.codecov.io/gh/zhangh12/multipleOutcomes)
 <!-- badges: end -->
 
 The goal of multipleOutcomes is to fit statistical models for multiple
