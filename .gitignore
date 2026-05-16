@@ -6,3 +6,9 @@
 *.so
 *.DS_Store
 inst/doc
+Rplots.pdf
+# regeneratable reference outputs (kept slim copy under inst/testdata/)
+inst/examples/legacy_km_reference.rds
+inst/examples/legacy_km_reference.txt
+inst/examples/new_km_reference.rds
+inst/examples/new_km_reference.txt

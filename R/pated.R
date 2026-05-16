@@ -42,46 +42,42 @@
 #' ## More examples can be found in the vignettes.
 #' library(survival)
 #' library(mvtnorm)
-#' library(tidyr)
-#' genData <- function(seed = NULL){
 #'
+#' genData <- function(seed = NULL){
 #'   set.seed(seed)
-#'   n <- 200
+#'   n <- 300
 #'   sigma <- matrix(c(1, .6, .6, 1), 2)
 #'   x <- rmvnorm(n, sigma = sigma)
 #'   z1 <- rbinom(n, 1, .6)
 #'   z2 <- rnorm(n)
-#'   gam <- c(.1, -.2)
 #'   trt <- rbinom(n, 1, .5)
 #'
-#'   bet <- c(-.2,.2)
-#'   y <- -.5+x %*% bet + z1 * .3 - z2 * .1 + .1 * trt-.1 * rnorm(n)
+#'   bet <- c(-.2, .2)
+#'   y <- -.5 + x %*% bet + z1 * .3 - z2 * .1 + .1 * trt - .1 * rnorm(n)
 #'   death <- rbinom(n, 1, .8)
-#'   id <- 1:n
 #'   data.frame(
-#'     y = y, trt = trt, 
-#'     z1 = z1, z2 = z2, 
-#'     x1 = x[, 1], x2 = x[, 2], 
-#'     death, id)
-#'
+#'     y = as.numeric(y), trt = trt,
+#'     z1 = z1, z2 = z2,
+#'     x1 = x[, 1], x2 = x[, 2],
+#'     death, pid = paste0('s-', seq_len(n))
+#'   )
 #' }
 #'
-#' dat1 <- genData(seed = 31415926)
-#' 
-#' ## create a dataset with repeated measurements x
-#' dat2 <- dat1 %>% pivot_longer(c(x1, x2), names_to='tmp', values_to='x') %>% 
-#' dplyr::select(x, trt, id) %>% as.data.frame()
-#' 
-#' fit <- 
+#' dat <- genData(seed = 31415926)
+#'
+#' fit <-
 #'   pated(
-#'     Surv(time=y, event=death) ~ trt,
-#'     z1 ~ trt, 
-#'     z2 ~ trt, 
-#'     x ~ trt, 
-#'     data=list(dat1, dat2))
-#' 
+#'     coxph_(Surv(time = y, event = death) ~ trt, data_index = 1),
+#'     glm_(z1 ~ trt, family = 'binomial',  data_index = 1),
+#'     glm_(z2 ~ trt, family = 'gaussian',  data_index = 1),
+#'     glm_(x1 ~ trt, family = 'gaussian',  data_index = 1),
+#'     glm_(x2 ~ trt, family = 'gaussian',  data_index = 1),
+#'     data = list(dat)
+#'   )
+#'
 #' fit
-#' 
+#'
+
 pated <- 
   function(
     ..., 
@@ -99,13 +95,8 @@ pated <-
       compute_cov = compute_cov, 
       seed = seed)
 
-  if(nboot > 0){
-    fml <- parseTreatmentVariableFromCall(...)
-  }else{
-    fml <- parseTreatmentVariableFromFormula(...)
-  }
-  
-  #id <- sapply(1:length(fit$id_map), function(i) fit$id_map[[i]][fml$arm[i]])
+  fml <- parseTreatmentVariableFromCall(...)
+
   id <- 
     lapply(
       seq_along(fit$id_map), 
@@ -136,7 +127,7 @@ pated <-
     mcov22 <- cov(fit$bootstrap_estimate[, id2, drop = FALSE])
     mcov21 <- cov(fit$bootstrap_estimate[, id2, drop = FALSE], fit$bootstrap_estimate[, id1, drop = FALSE])
     var11 <- apply(fit$bootstrap_estimate[, id1, drop = FALSE], 2, var)
-    if(!('kmMO' %in% fml$func)){
+    if(!('km_' %in% fml$func)){
       mcov <- cov(fit$bootstrap_estimate)
     }
   }
@@ -158,10 +149,8 @@ pated <-
       corr = NA
     )
 
-  if(is.null(family)){
-    family <- gsub('MO', '', fml$func)
-    family <- c(rep(family[1], length(id1)), rep(family[-1], times = fml$n_terms[-1]))
-  }
+  family <- sub('_$', '', sub('MO$', '', fml$func))
+  family <- c(rep(family[1], length(id1)), rep(family[-1], times = fml$n_terms[-1]))
   
   nonconfounder <-
     data.frame(
@@ -183,9 +172,9 @@ pated <-
     attr(ret, 'Rel. Eff.') <- mcov[id1, id1] / stderr^2
   }
   
-  if(fml$func[1] %in% 'kmMO'){
-    
-    conf.type <- fml$arg[fml$func %in% 'kmMO'][1]
+  if(fml$func[1] %in% 'km_'){
+
+    conf.type <- fml$arg[fml$func %in% 'km_'][1]
     pated_res <- 
       treatment %>% 
       dplyr::select(estimate, stderr) %>% 

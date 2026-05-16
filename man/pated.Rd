@@ -57,43 +57,38 @@ of the conventional models specified in \code{...} are improved by \code{pated}.
 ## More examples can be found in the vignettes.
 library(survival)
 library(mvtnorm)
-library(tidyr)
-genData <- function(seed = NULL){
 
+genData <- function(seed = NULL){
   set.seed(seed)
-  n <- 200
+  n <- 300
   sigma <- matrix(c(1, .6, .6, 1), 2)
   x <- rmvnorm(n, sigma = sigma)
   z1 <- rbinom(n, 1, .6)
   z2 <- rnorm(n)
-  gam <- c(.1, -.2)
   trt <- rbinom(n, 1, .5)
 
-  bet <- c(-.2,.2)
-  y <- -.5+x \%*\% bet + z1 * .3 - z2 * .1 + .1 * trt-.1 * rnorm(n)
+  bet <- c(-.2, .2)
+  y <- -.5 + x \%*\% bet + z1 * .3 - z2 * .1 + .1 * trt - .1 * rnorm(n)
   death <- rbinom(n, 1, .8)
-  id <- 1:n
   data.frame(
-    y = y, trt = trt, 
-    z1 = z1, z2 = z2, 
-    x1 = x[, 1], x2 = x[, 2], 
-    death, id)
-
+    y = as.numeric(y), trt = trt,
+    z1 = z1, z2 = z2,
+    x1 = x[, 1], x2 = x[, 2],
+    death, pid = paste0('s-', seq_len(n))
+  )
 }
 
-dat1 <- genData(seed = 31415926)
+dat <- genData(seed = 31415926)
 
-## create a dataset with repeated measurements x
-dat2 <- dat1 \%>\% pivot_longer(c(x1, x2), names_to='tmp', values_to='x') \%>\% 
-dplyr::select(x, trt, id) \%>\% as.data.frame()
-
-fit <- 
+fit <-
   pated(
-    Surv(time=y, event=death) ~ trt,
-    z1 ~ trt, 
-    z2 ~ trt, 
-    x ~ trt, 
-    data=list(dat1, dat2))
+    coxph_(Surv(time = y, event = death) ~ trt, data_index = 1),
+    glm_(z1 ~ trt, family = 'binomial',  data_index = 1),
+    glm_(z2 ~ trt, family = 'gaussian',  data_index = 1),
+    glm_(x1 ~ trt, family = 'gaussian',  data_index = 1),
+    glm_(x2 ~ trt, family = 'gaussian',  data_index = 1),
+    data = list(dat)
+  )
 
 fit
 

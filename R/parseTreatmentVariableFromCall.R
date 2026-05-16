@@ -22,11 +22,11 @@ parseTreatmentVariableFromCall <- function(...){
     n_terms0 <- 1
     
     idx <- idx + 1
-    if(func[idx] %in% 'kmMO'){
-      if(is.null(cstr$conf.type)){
-        stop('conf.type is missing in kmMO')
+    if(func[idx] %in% 'km_'){
+      if(is.null(cstr$conf_type)){
+        stop('conf_type is missing in km_')
       }
-      arg0 <- cstr$conf.type
+      arg0 <- cstr$conf_type
     }
     
     if(func[idx] %in% 'glmMO'){

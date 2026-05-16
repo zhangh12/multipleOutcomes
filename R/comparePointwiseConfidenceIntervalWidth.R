@@ -4,8 +4,7 @@
 # 1. PATED adjusted KM curve
 # 2. Conventional KM curve
 comparePointwiseConfidenceIntervalWidth <- function(pated_res, km_res, transform = 'identity'){
-  
-  conf.type <- attr(pated_res, 'conf.type')
+
   pated_estimate <- pated_res$estimate
   names(pated_estimate) <- rownames(pated_res)
   pated_coordinate <- 
