@@ -21,17 +21,15 @@ conditional power are illustrated.
 
 ## Installation
 
-You can install the development version of multipleOutcomes from
-[GitHub](https://github.com/) with:
+Install the development version from GitHub:
 
 ``` r
-if (!require("remotes")) {
+if(!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 remotes::install_github(
-  "zhangh12/multipleOutcomes", 
-  build_manual = TRUE, 
-  force = TRUE
+  "zhangh12/multipleOutcomes",
+  dependencies = TRUE
 )
 ```
 
