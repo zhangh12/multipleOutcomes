@@ -71,6 +71,39 @@ test_that("MC: empirical cov matches theoretical for glm_(binomial)", {
 })
 
 # ---------------------------------------------------------------------------
+test_that("MC: logrank_ is standardized (mean 0, variance 1) under H0", {
+  skip_on_cran()
+  skip_if_not(mc_enabled(),
+              "set MULTIPLEOUTCOMES_RUN_MC=1 to run Monte Carlo tests")
+  skip_if_not_installed("survival")
+  library(survival)
+  K <- 400; n <- 500
+
+  # LogRankAdapter returns I^{-1/2} * U(0): standardized log-rank stat.
+  # Under H0 (beta_arm = 0) this is approximately N(0, 1).
+  res <- mc_run(
+    K,
+    simulate = function(k) sim_coxph(n = n, beta_arm = 0,
+                                     seed = 4500L + k),
+    fit_fn   = function(dat) jointCovariance(
+      logrank_(Surv(time, event) ~ arm, data_index = 1),
+      data = list(dat)
+    )
+  )
+  emp_var <- as.numeric(cov(res$beta_hat))
+  thr_var <- as.numeric(res$vcov_mean)
+
+  expect_lt(abs(mean(res$beta_hat)), 0.10,
+            label = "logrank null mean ~ 0")
+  expect_lt(abs(emp_var - 1) , 0.20,
+            label = "logrank null variance ~ 1 (empirical)")
+  expect_lt(abs(thr_var - 1), 0.20,
+            label = "logrank null variance ~ 1 (theoretical)")
+  expect_lt(abs(emp_var - thr_var) / thr_var, 0.20,
+            label = "logrank empirical/theoretical variance agree")
+})
+
+# ---------------------------------------------------------------------------
 test_that("MC: empirical cov matches theoretical for coxph_", {
   skip_on_cran()
   skip_if_not(mc_enabled(),

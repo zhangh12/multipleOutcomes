@@ -69,6 +69,34 @@ test_that("MC: mmrm + glm cross-engine covariance is calibrated", {
 })
 
 # ---------------------------------------------------------------------------
+test_that("MC: gee + glm cross-engine covariance with partial overlap (70%)", {
+  skip_on_cran()
+  skip_if_not(mc_enabled(),
+              "set MULTIPLEOUTCOMES_RUN_MC=1 to run Monte Carlo tests")
+  K <- 200; n <- 300
+
+  res <- mc_run(
+    K,
+    simulate = function(k) sim_correlated_multi(n_subj = n,
+                                                long_overlap_frac = 0.7,
+                                                seed = 9500L + k),
+    fit_fn   = function(dat) jointCovariance(
+      gee_(y_long ~ arm, family = "gaussian",
+           corstr = "exchangeable", data_index = 1),
+      glm_(y_cont ~ arm, family = "gaussian", data_index = 2),
+      data = list(dat$long, dat$wide)
+    )
+  )
+  # Tolerance is slightly looser here than the full-overlap case because the
+  # cross-block scales by ~0.7 and MC noise scales by 1/sqrt(K_effective).
+  expect_cov_close(cov(res$beta_hat), res$vcov_mean,
+                   rel_diag = 0.30, abs_offdiag = 0.05,
+                   label = "gee x glm (70% overlap)")
+  expect_nontrivial_cross_cor(cov(res$beta_hat),
+                              label = "(gee x glm partial overlap)")
+})
+
+# ---------------------------------------------------------------------------
 # Kitchen-sink: 4 engines, 4 endpoint types, correlated outcomes.
 test_that("MC: kitchen-sink (glm-gaussian, glm-binomial, coxph, gee) is calibrated", {
   skip_on_cran()

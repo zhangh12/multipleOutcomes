@@ -69,6 +69,7 @@ sim_correlated_multi <- function(n_subj    = 250,
                                  admin_tau = 5,
                                  sigma_y   = 0.50,
                                  sigma_e   = 0.30,
+                                 long_overlap_frac = 1.0,
                                  seed      = NULL) {
   if (!is.null(seed)) set.seed(seed)
 
@@ -101,6 +102,16 @@ sim_correlated_multi <- function(n_subj    = 250,
     arm   = rep(arm, each = n_visits),
     y_long = as.vector(t(long_y))
   )
+
+  # Optional: keep longitudinal records for only a random subset of subjects,
+  # so wide and long share only `long_overlap_frac * n_subj` pids in common.
+  # Exercises the n_shared_sample_sizes / FisherInformation overlap-weighting
+  # path in jointCovariance().
+  if (long_overlap_frac < 1.0) {
+    n_keep   <- max(1L, floor(long_overlap_frac * n_subj))
+    keep_pid <- sample(pid, size = n_keep)
+    long <- long[long$pid %in% keep_pid, , drop = FALSE]
+  }
 
   list(wide = wide, long = long)
 }
