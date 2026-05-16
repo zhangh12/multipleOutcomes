@@ -132,7 +132,24 @@ pated <-
   opt_c <- - solve(mcov22) %*% mcov21
 
   estimate <- Delta + as.vector(t(opt_c) %*% delta)
-  stderr <- sqrt(var11 + diag(t(opt_c) %*% mcov21) + diag(t(mcov21) %*% opt_c) + diag(t(opt_c) %*% mcov22 %*% opt_c))
+  variance <- var11 +
+              diag(t(opt_c) %*% mcov21) +
+              diag(t(mcov21) %*% opt_c) +
+              diag(t(opt_c) %*% mcov22 %*% opt_c)
+  if (any(variance < 0, na.rm = TRUE)) {
+    warning(
+      "PATED residual variance is negative for ",
+      sum(variance < 0, na.rm = TRUE),
+      " of ", length(variance), " term(s); the resulting stderr / p-value ",
+      "will be NaN. This typically means one or more prognostic variables ",
+      "are nearly collinear with the primary outcome (or with each other), ",
+      "so the adjustment leaves no residual variance to estimate. Check ",
+      "that the prognostic variables are independent of arm assignment ",
+      "and not redundant with the primary outcome.",
+      call. = FALSE
+    )
+  }
+  stderr <- sqrt(variance)
 
   pvalue <- pchisq((estimate / stderr)^2, df = 1, lower.tail = FALSE)
   
