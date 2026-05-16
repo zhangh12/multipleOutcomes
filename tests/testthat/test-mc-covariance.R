@@ -7,55 +7,7 @@
 # answer). They run under devtools::test() / R CMD check --as-cran with the
 # right flags, but are skipped on CRAN and in the default test run.
 
-# Trigger:
-#   - On CRAN: always skip.
-#   - Otherwise: only run when MULTIPLEOUTCOMES_RUN_MC is set to a truthy value,
-#     so a casual `devtools::test()` stays fast.
-mc_enabled <- function() {
-  v <- Sys.getenv("MULTIPLEOUTCOMES_RUN_MC", unset = "")
-  isTRUE(v %in% c("1", "true", "TRUE", "yes"))
-}
-
-# Pull only the columns/rows that correspond to a chosen model's coefficients.
-ids_of <- function(fit, model_index) {
-  fit$id_map[[model_index]]
-}
-
-# Run K reps of a single jointCovariance() spec. Returns:
-#   beta_hat  : K x p matrix of coefficient estimates
-#   vcov_mean : p x p matrix, mean of vcov(fit) across reps
-mc_run <- function(K, simulate, fit_fn, model_index = NULL) {
-  beta_list <- vector("list", K)
-  vcov_list <- vector("list", K)
-  for (k in seq_len(K)) {
-    dat <- simulate(k)
-    fit <- fit_fn(dat)
-    if (is.null(model_index)) {
-      beta_list[[k]] <- coef(fit)
-      vcov_list[[k]] <- vcov(fit)
-    } else {
-      ids <- ids_of(fit, model_index)
-      beta_list[[k]] <- coef(fit)[ids]
-      vcov_list[[k]] <- vcov(fit)[ids, ids, drop = FALSE]
-    }
-  }
-  beta_hat  <- do.call(rbind, beta_list)
-  vcov_mean <- Reduce("+", vcov_list) / K
-  list(beta_hat = beta_hat, vcov_mean = vcov_mean)
-}
-
-# Assertion: emp ~ thr on diagonal (relative) and off-diagonal (absolute).
-expect_cov_close <- function(emp, thr, rel_diag = 0.30, abs_offdiag = 0.05,
-                             label = "") {
-  d_e <- diag(emp); d_t <- diag(thr)
-  rel <- abs(d_e - d_t) / pmax(abs(d_t), 1e-8)
-  expect_lt(max(rel), rel_diag,
-            label = paste("diagonal rel-error", label))
-  offdiag_e <- emp; diag(offdiag_e) <- 0
-  offdiag_t <- thr; diag(offdiag_t) <- 0
-  expect_lt(max(abs(offdiag_e - offdiag_t)), abs_offdiag,
-            label = paste("off-diagonal abs-error", label))
-}
+# mc_enabled(), mc_run(), and expect_cov_close() live in helper-mc.R.
 
 # ---------------------------------------------------------------------------
 test_that("MC: empirical cov matches theoretical for glm_(gaussian) joint", {
