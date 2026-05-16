@@ -132,7 +132,15 @@ pated <-
   opt_c <- - solve(mcov22) %*% mcov21
 
   estimate <- Delta + as.vector(t(opt_c) %*% delta)
-  stderr <- sqrt(var11 + diag(t(opt_c) %*% mcov21) + diag(t(mcov21) %*% opt_c) + diag(t(opt_c) %*% mcov22 %*% opt_c))
+  # var11 + 2*diag(opt_c' mcov21) + diag(opt_c' mcov22 opt_c) algebraically
+  # equals var11 - diag(mcov21' mcov22^{-1} mcov21), a residual variance that
+  # is >= 0 in theory but can dip to -eps with near-singular mcov22 or under
+  # different BLAS round-off. Clamp at 0 before sqrt.
+  variance <- var11 +
+              diag(t(opt_c) %*% mcov21) +
+              diag(t(mcov21) %*% opt_c) +
+              diag(t(opt_c) %*% mcov22 %*% opt_c)
+  stderr <- sqrt(pmax(variance, 0))
 
   pvalue <- pchisq((estimate / stderr)^2, df = 1, lower.tail = FALSE)
   
