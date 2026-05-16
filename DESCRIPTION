@@ -11,6 +11,8 @@ Description: Fits generalized linear models, Cox proportional-hazards
     Assisted Treatment Effect Detection), a randomized-trial method that
     exploits balanced prognostic covariates to tighten standard errors and
     increase statistical power without introducing bias.
+URL: https://github.com/zhangh12/multipleOutcomes, https://zhangh12.github.io/multipleOutcomes/
+BugReports: https://github.com/zhangh12/multipleOutcomes/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

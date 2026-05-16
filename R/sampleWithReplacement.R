@@ -5,8 +5,10 @@
 #' @importFrom dplyr summarise
 #' @importFrom dplyr group_by
 #' 
-#' @param data a data frame to be sampled from. 
-#' 
+#' @param data a data frame to be sampled from.
+#'
+#' @keywords internal
+#' @noRd
 sampleWithReplacement <- function(data){
   
   uid <- 

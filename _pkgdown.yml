@@ -1,0 +1,39 @@
+url: https://zhangh12.github.io/multipleOutcomes/
+
+template:
+  bootstrap: 5
+
+reference:
+  - title: Joint estimation and inference
+    desc: >
+      Build a joint asymptotic covariance across heterogeneous outcome models,
+      and run PATED for prognostic-covariate-adjusted treatment-effect tests.
+    contents:
+      - jointCovariance
+      - pated
+
+  - title: Model specifications
+    desc: >
+      Spec constructors describing how each component model is fit. Pass them
+      as the `...` arguments to `jointCovariance()` or `pated()`.
+    contents:
+      - glm_
+      - coxph_
+      - logrank_
+      - gee_
+      - mmrm_
+      - km_
+      - quantile_
+
+  - title: Extracting results
+    contents:
+      - coef.jointCovariance
+      - vcov.jointCovariance
+      - summary.jointCovariance
+      - print.summary.jointCovariance
+      - plot.pated
+
+  - title: Datasets and simulation
+    contents:
+      - actg
+      - simulateMoData
