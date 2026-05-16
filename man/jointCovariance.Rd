@@ -118,12 +118,25 @@ fit
 bfit <-jointCovariance(
   coxph_(Surv(time=y, event=death) ~ trt, data_index = 1),
   logrank_(Surv(time=y, event=death) ~ trt, data_index = 1),
-  glm_(z1 ~ trt, family = 'binomial', data_index = 1), 
-  glm_(z2 ~ trt, family = 'gaussian', data_index = 1), 
-  mmrm_(x ~ trt + us(visit | pid), reml = TRUE, data_index = 2), 
-  gee_(x ~ trt, family = 'gaussian', corstr = 'independence', data_index = 2), 
+  glm_(z1 ~ trt, family = 'binomial', data_index = 1),
+  glm_(z2 ~ trt, family = 'gaussian', data_index = 1),
+  mmrm_(x ~ trt + us(visit | pid), reml = TRUE, data_index = 2),
+  gee_(x ~ trt, family = 'gaussian', corstr = 'independence', data_index = 2),
   data = list(dat1, dat2), nboot = 10)
 
 summary(bfit)
+
+## km_() and quantile_() require nboot > 0 because they have no
+## closed-form score. compute_cov is forced to FALSE for km_().
+kfit <- jointCovariance(
+  km_(Surv(time = y, event = death) ~ trt, conf_type = 'log',
+      times = c(0.5, 1, 1.5), data_index = 1),
+  glm_(z1 ~ trt, family = 'binomial', data_index = 1),
+  data = list(dat1, dat2), nboot = 30, seed = 1)
+
+qfit <- jointCovariance(
+  quantile_(y ~ trt, probs = c(0.25, 0.5, 0.75), data_index = 1),
+  glm_(z2 ~ trt, family = 'gaussian', data_index = 1),
+  data = list(dat1, dat2), nboot = 30, seed = 1)
 
 }
