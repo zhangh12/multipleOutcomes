@@ -3,7 +3,8 @@
 #' @importFrom mvtnorm rmvnorm
 #' @importFrom tidyr pivot_longer
 #' @importFrom survival survfit strata
-#' @importFrom dplyr "%>%" select
+#' @importFrom dplyr "%>%" select mutate
 #' @importFrom tidyselect all_of
 #' @importFrom rlang .data
+#' @importFrom stringr str_glue
 NULL

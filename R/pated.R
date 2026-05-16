@@ -8,7 +8,7 @@
 #' 
 #' @importFrom stringr str_extract
 #' @importFrom ggpubr ggarrange
-#' @importFrom stats rbinom rnorm runif sd time var
+#' @importFrom stats coef cov cov2cor pchisq printCoefmat rbinom rnorm runif sd time var vcov
 #' @importFrom dplyr row_number first case_when bind_rows filter arrange desc 
 #' @importFrom ggplot2 geom_hline geom_vline scale_color_manual theme element_blank
 #' @importFrom rlang .data

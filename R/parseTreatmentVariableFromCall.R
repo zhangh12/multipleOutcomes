@@ -29,13 +29,6 @@ parseTreatmentVariableFromCall <- function(...){
       arg0 <- cstr$conf_type
     }
     
-    if(func[idx] %in% 'glmMO'){
-      if(is.null(cstr$family)){
-        stop('family is missing in glmMO')
-      }
-      arg0 <- cstr$family
-    }
-    
     if(func[idx] %in% 'quantileMO'){
       if(is.null(cstr$probs)){
         stop('probs is missing in quantileMO')
