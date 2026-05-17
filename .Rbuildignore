@@ -8,6 +8,7 @@ vignettes
 ^data-raw$
 ^inst/examples$
 ^_pkgdown\.yml$
+^pkgdown$
 ^docs$
 ^\.github$
 ^\.positai$

@@ -114,7 +114,7 @@ fit <- jointCovariance(
 
 fit
 
-
+\donttest{
 bfit <-jointCovariance(
   coxph_(Surv(time=y, event=death) ~ trt, data_index = 1),
   logrank_(Surv(time=y, event=death) ~ trt, data_index = 1),
@@ -140,5 +140,6 @@ qfit <- jointCovariance(
   quantile_(y ~ trt, probs = c(0.25, 0.5, 0.75)),
   glm_(z2 ~ trt, family = 'gaussian'),
   data = dat1, nboot = 30, seed = 1)
+}
 
 }

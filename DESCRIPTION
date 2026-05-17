@@ -1,6 +1,6 @@
 Package: multipleOutcomes
 Title: Joint Covariance and Treatment-Effect Tests for Multiple Outcomes
-Version: 0.16
+Version: 0.16.1
 Authors@R:
     person("Han", "Zhang", , "zhangh.ustc@gmail.com", role = c("aut", "cre"))
 Description: Fits generalized linear models, Cox proportional-hazards
@@ -17,14 +17,12 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Imports: 
+Imports:
     dplyr,
     ggplot2,
     ggpubr,
     mmrm (>= 0.3.15),
-    momentfit,
     mvtnorm,
-    numDeriv,
     rlang,
     sandwich,
     stringr,
@@ -39,6 +37,8 @@ Suggests:
     JM,
     joint.Cox,
     knitr,
+    momentfit,
+    numDeriv,
     pec,
     randomForestSRC,
     rmarkdown,

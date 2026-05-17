@@ -9,6 +9,10 @@ logrank_(formula, ties = c("efron", "breslow", "exact"), data_index = 1)
 \arguments{
 \item{formula}{see \code{formula} in \code{survival::coxph}.}
 
+\item{ties}{character string specifying the method for tie handling. One of
+\code{"efron"} (default), \code{"breslow"}, or \code{"exact"}. Passed through to
+\code{survival::coxph}.}
+
 \item{data_index}{integer. Index of the data frame in the \code{data} argument of
 \code{jointCovariance} to be used when computing testing statistic of logrank
 test.}

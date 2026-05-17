@@ -119,7 +119,7 @@
 # }
 # 
 # #set.seed(2)
-# #fit <- gmm4(moments, x = data, theta0 = rnorm(6), type = 'twostep')
+# #fit <- momentfit::gmm4(moments, x = data, theta0 = rnorm(6), type = 'twostep')
 # 
 # #set.seed(1)
 # t0 <- rnorm(6)
@@ -135,7 +135,7 @@
 #   fn <- c(fn, moments(t0, data))
 #   print(tail(fn, 1))
 #   print('================')
-#   g <- grad(moments, t0, data = data)
+#   g <- numDeriv::grad(moments, t0, data = data)
 #   t0 <- t0 - .5 * g
 #   eps <- max(abs(.5 * g))
 #   if(eps < 1e-4){

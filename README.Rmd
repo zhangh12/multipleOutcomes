@@ -39,7 +39,7 @@ remotes::install_github(
 
 ## Example
 
-Let's get started by analyzing a real randomized trial data. The data was from a randomized clinical trial of indomethacin to prevent post-ERCP pancreatitis. The binary endpoint is post-ERCP pancreatitis (yes/no). It was collected, reformatted and shared by Dr. Peter Higgins in his R package [`medicaldata`](https://cloud.r-project.org/web/packages/medicaldata/index.html). For more information, please refer to the data set `indo_rct` in `medicaldata`, and the [manuscript](https://www.nejm.org/doi/full/10.1056/NEJMoa1111103).
+Let's get started by analyzing a real randomized trial data. The data was from a randomized clinical trial of indomethacin to prevent post-ERCP pancreatitis. The binary endpoint is post-ERCP pancreatitis (yes/no). It was collected, reformatted and shared by Dr. Peter Higgins in his R package [`medicaldata`](https://CRAN.R-project.org/package=medicaldata). For more information, please refer to the data set `indo_rct` in `medicaldata`, and the [manuscript](https://doi.org/10.1056/NEJMoa1111103).
 
 Here we use the PATED method to estimate marginal treatment effect on post-ERCP pancreatitis, adjusting for a set of risk factors for PEP as potential prognostic covariates. I am not an expert of this disease, so I simply follow the description information of the covariates in `medicaldata`. 
 

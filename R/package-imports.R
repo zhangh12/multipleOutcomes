@@ -7,4 +7,6 @@
 #' @importFrom tidyselect all_of
 #' @importFrom rlang .data
 #' @importFrom stringr str_glue
+#' @importFrom stats model.matrix resid
+#' @importFrom sandwich estfun bread
 NULL

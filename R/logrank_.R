@@ -6,7 +6,10 @@
 #' argument `...`. Logrank test is the score test under the proportional hazards 
 #' regression model. The object defines how a logrank test would be computed. 
 #' 
-#' @param formula see `formula` in `survival::coxph`. 
+#' @param formula see `formula` in `survival::coxph`.
+#' @param ties character string specifying the method for tie handling. One of
+#' `"efron"` (default), `"breslow"`, or `"exact"`. Passed through to
+#' `survival::coxph`.
 #' @param data_index integer. Index of the data frame in the `data` argument of
 #' `jointCovariance` to be used when computing testing statistic of logrank 
 #' test.
