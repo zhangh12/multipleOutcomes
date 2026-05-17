@@ -3,6 +3,9 @@ url: https://zhangh12.github.io/multipleOutcomes/
 template:
   bootstrap: 5
 
+navbar:
+  title: "Joint Covariance and Treatment-Effect Tests for Multiple Outcomes"
+
 reference:
   - title: Joint estimation and inference
     desc: >

@@ -3,7 +3,7 @@
 # for HR in coxph, use mean = TRUE
 # for logrank, use mean = FALSE
 imatCoxph <- function(model, mean = TRUE){
-  imat <- coxph.detail(model)$imat
+  imat <- survival::coxph.detail(model)$imat
   n <- nrow(matrix(resid(model, type = 'score')))
   if('numeric' %in% class(imat)){
     imat <- sum(imat) / n
