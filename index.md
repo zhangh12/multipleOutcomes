@@ -29,10 +29,10 @@ was from a randomized clinical trial of indomethacin to prevent
 post-ERCP pancreatitis. The binary endpoint is post-ERCP pancreatitis
 (yes/no). It was collected, reformatted and shared by Dr. Peter Higgins
 in his R package
-[`medicaldata`](https://cloud.r-project.org/web/packages/medicaldata/index.html).
-For more information, please refer to the data set `indo_rct` in
+[`medicaldata`](https://CRAN.R-project.org/package=medicaldata). For
+more information, please refer to the data set `indo_rct` in
 `medicaldata`, and the
-[manuscript](https://www.nejm.org/doi/full/10.1056/NEJMoa1111103).
+[manuscript](https://doi.org/10.1056/NEJMoa1111103).
 
 Here we use the PATED method to estimate marginal treatment effect on
 post-ERCP pancreatitis, adjusting for a set of risk factors for PEP as

@@ -1,4 +1,4 @@
 # License
 
-    YEAR: 2024
-    COPYRIGHT HOLDER: multipleOutcomes authors
+    YEAR: 2026
+    COPYRIGHT HOLDER: Han Zhang

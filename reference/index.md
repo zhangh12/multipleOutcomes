@@ -51,5 +51,7 @@ or
 
 - [`actg`](https://zhangh12.github.io/multipleOutcomes/reference/actg.md)
   : ACTG 320 Clinical Trial Dataset
+- [`indo`](https://zhangh12.github.io/multipleOutcomes/reference/indo.md)
+  : Rectal Indomethacin for Prevention of Post-ERCP Pancreatitis
 - [`simulateMoData()`](https://zhangh12.github.io/multipleOutcomes/reference/simulateMoData.md)
   : Generating Data for Simulation and Testing

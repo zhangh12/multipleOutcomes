@@ -20,6 +20,12 @@ logrank_(formula, ties = c("efron", "breslow", "exact"), data_index = 1)
   see `formula` in
   [`survival::coxph`](https://rdrr.io/pkg/survival/man/coxph.html).
 
+- ties:
+
+  character string specifying the method for tie handling. One of
+  `"efron"` (default), `"breslow"`, or `"exact"`. Passed through to
+  [`survival::coxph`](https://rdrr.io/pkg/survival/man/coxph.html).
+
 - data_index:
 
   integer. Index of the data frame in the `data` argument of

@@ -199,7 +199,7 @@
     #> 5                          atrialFib    glm  3.3e-01  0.246  0.181 Prognostic
     #> 6                         prevStroke    glm -8.6e-02  0.207  0.679 Prognostic
     #> 7                         othDisease    glm -2.6e-02  0.230  0.909 Prognostic
-    #> 8                                ihd    glm -7.5e-17  0.217  1.000 Prognostic
+    #> 8                                ihd    glm -2.1e-16  0.217  1.000 Prognostic
     #> 9                           diabetes    glm -1.6e-01  0.234  0.485 Prognostic
     #> 10                           alcohol    glm -3.2e-01  0.175  0.068 Prognostic
     #> 11                               sex    glm -1.1e-01  0.163  0.514 Prognostic

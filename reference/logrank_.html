@@ -13,7 +13,7 @@ regression model. The object defines how a logrank test would be computed."></he
 
     <a class="navbar-brand me-2" href="../index.html">multipleOutcomes</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.16</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.16.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,6 +61,12 @@ regression model. The object defines how a logrank test would be computed.</p>
 
 <dl><dt id="arg-formula">formula<a class="anchor" aria-label="anchor" href="#arg-formula"></a></dt>
 <dd><p>see <code>formula</code> in <code><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">survival::coxph</a></code>.</p></dd>
+
+
+<dt id="arg-ties">ties<a class="anchor" aria-label="anchor" href="#arg-ties"></a></dt>
+<dd><p>character string specifying the method for tie handling. One of
+<code>"efron"</code> (default), <code>"breslow"</code>, or <code>"exact"</code>. Passed through to
+<code><a href="https://rdrr.io/pkg/survival/man/coxph.html" class="external-link">survival::coxph</a></code>.</p></dd>
 
 
 <dt id="arg-data-index">data_index<a class="anchor" aria-label="anchor" href="#arg-data-index"></a></dt>
