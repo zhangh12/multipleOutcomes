@@ -1,0 +1,414 @@
+---
+title: "PATED: Prognostic-Assisted Treatment Effect Detection in Randomized Trials"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PATED: Prognostic-Assisted Treatment Effect Detection in Randomized Trials}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+## Overview
+
+In a properly randomized clinical trial, baseline covariates are balanced
+between treatment arms *in expectation*. PATED (Prognostic-Assisted
+Treatment Effect Detection) exploits that fact: by jointly modelling the
+primary endpoint together with a panel of prognostic baseline covariates
+and accounting for their joint covariance, the estimated treatment effect
+on the primary endpoint can be adjusted to remove chance imbalance,
+shrinking its standard error without introducing bias.
+
+`pated()` returns a data frame with one row per term. The first two
+rows are the adjusted (`method = "PATED"`) and unadjusted
+(`method = "Standard"`) estimates of the primary treatment effect,
+each with its standard error and p-value. The remaining rows hold the
+per-arm regression of each prognostic covariate on the treatment
+indicator (`method = "Prognostic"`), again with estimates, standard
+errors, p-values, and the estimated correlation with the primary
+endpoint. The function does not report a Wald statistic or relative
+efficiency directly; those are simple derived quantities and we
+compute them inside this vignette via a small helper.
+
+This vignette walks through eight publicly available randomized trial
+datasets distributed in CRAN packages. Each example fits a Cox model for
+the primary time-to-event endpoint together with GLMs for the baseline
+covariates, all sharing the treatment indicator. Datasets that bundle
+disparate cohorts or that originate from observational studies are
+deliberately excluded so that the randomization assumption underlying
+PATED is satisfied.
+
+### Reading the diagnostic plot
+
+Diagnosis is delivered through the `plot()` method, which converts
+each row of the `pated` object into a Wald z-statistic
+(`estimate / stderr`) and arranges them on a forest-style chart:
+
+- The **red** point at the top is the PATED-adjusted z for the
+  primary endpoint.
+- The **blue** point just below is the *unadjusted* z for the same
+  endpoint.
+- The **gray** points are the per-arm z-statistics for each baseline
+  covariate (`covariate ~ arm`), ordered by their estimated
+  correlation with the primary outcome (strongest at the top).
+
+Dashed vertical lines mark `z = 0` and `z = +/-1.96`. Two things to
+look for:
+
+1. **Baseline balance.** Under randomization the gray prognostic
+   points should scatter around zero with only a few drifting past
+   `+/-1.96` by chance. A systematic shift to one side, or many
+   covariates outside the +/-1.96 band, suggests imbalance worth
+   investigating before relying on the adjusted estimate.
+2. **Power gain.** PATED removes the component of the primary effect
+   that is explained by chance baseline imbalance. When the red PATED
+   point sits noticeably further from zero than the blue unadjusted
+   point, the prognostic panel has shaved variance off the primary
+   estimate; when red and blue nearly coincide, the covariates added
+   little.
+
+### Relative efficiency helper
+
+Relative efficiency (RE) of PATED over the unadjusted analysis is the
+ratio of their sampling variances. We compute it from the two
+treatment-effect rows of the `pated` return:
+
+\[
+\text{RE} = \left(\frac{\text{stderr}_\text{Standard}}{\text{stderr}_\text{PATED}}\right)^2
+\]
+
+A value larger than 1 means PATED produced a tighter standard error
+than the unadjusted analysis on the same data.
+
+```{r setup, message = FALSE, echo = TRUE}
+library(multipleOutcomes)
+library(dplyr)
+library(survival)
+options(digits = 2)
+
+# pated() requires a subject identifier; add one if the data lack it.
+add_pid <- function(df) {
+  df$pid <- paste0("s-", seq_len(nrow(df)))
+  df
+}
+
+# Derive RE from the two primary-effect rows that pated() returns.
+relativeEfficiency <- function(obj){
+  adj   <- obj[obj$method == 'PATED',    'stderr']
+  unadj <- obj[obj$method == 'Standard', 'stderr']
+  (unadj / adj)^2
+}
+
+printObject <- function(obj){
+  message(gsub('_', '::', deparse(substitute(obj))))
+  message(paste0('Relative Efficiency: ',
+                 format(relativeEfficiency(obj), digits = 3)))
+  print(obj)
+}
+```
+
+## Smoking cessation: `asaur::pharmacoSmoking`
+
+Steinberg et al. (2009) randomized 125 smokers (61 combination,
+64 patch-only) to a triple-medication "combination" arm (nicotine
+patch plus bupropion plus a nicotine lozenge) or to a patch-only arm.
+The primary endpoint is time to relapse (`ttr`/`relapse`); baseline
+covariates include age, smoking history, prior cessation attempts,
+gender, race, employment status, and a smoking intensity score.
+
+```{r, message = FALSE}
+data(pharmacoSmoking, package = 'asaur')
+
+asaur_pharmacoSmoking <-
+  pated(
+    coxph_(Surv(time = ttr, event = relapse) ~ grp,           data_index = 1),
+    glm_(age            ~ grp, family = "gaussian",           data_index = 1),
+    glm_(yearsSmoking   ~ grp, family = "gaussian",           data_index = 1),
+    glm_(priorAttempts  ~ grp, family = "gaussian",           data_index = 1),
+    glm_(longestNoSmoke ~ grp, family = "gaussian",           data_index = 1),
+    glm_(gender         ~ grp, family = "binomial",           data_index = 1),
+    glm_(I(race == 'black')        ~ grp, family = "binomial", data_index = 1),
+    glm_(I(race == 'hispanic')     ~ grp, family = "binomial", data_index = 1),
+    glm_(I(race == 'white')        ~ grp, family = "binomial", data_index = 1),
+    glm_(I(employment == 'ft')     ~ grp, family = "binomial", data_index = 1),
+    glm_(I(employment == 'pt')     ~ grp, family = "binomial", data_index = 1),
+    glm_(I(levelSmoking == 'heavy')~ grp, family = "binomial", data_index = 1),
+    data = list(add_pid(pharmacoSmoking %>%
+                          mutate(grp = ifelse(grp == 'combination', 1, 0))))
+  )
+
+printObject(asaur_pharmacoSmoking)
+plot(asaur_pharmacoSmoking)
+```
+
+## Malignant glioma: `coin::glioma`
+
+Grana et al. (2002) reported a small randomized trial of locoregional
+radioimmunotherapy in patients with high-grade glioma (37 patients
+total: 18 control, 19 radioimmunotherapy). Patients received standard
+therapy with or without adjuvant radioimmunotherapy using `90`Y-biotin.
+The endpoint is overall survival; available baseline covariates are
+age, sex, and histology (glioblastoma multiforme vs. grade III
+astrocytoma).
+
+```{r, message = FALSE}
+data(glioma, package = 'coin')
+
+coin_glioma <-
+  pated(
+    coxph_(Surv(time = time, event = event)   ~ group, data_index = 1),
+    glm_(age                ~ group, family = "gaussian", data_index = 1),
+    glm_(sex                ~ group, family = "binomial", data_index = 1),
+    glm_(I(histology == 'GBM') ~ group, family = "binomial", data_index = 1),
+    data = list(add_pid(glioma %>%
+                          mutate(group = ifelse(group == 'Control', 0, 1),
+                                 event = 1 * event)))
+  )
+
+printObject(coin_glioma)
+plot(coin_glioma)
+```
+
+## Burn-wound infection: `iBST::burn`
+
+The burn data from Klein and Moeschberger (1997) come from a clinical
+trial in which 154 severely burned patients (70 routine bathing,
+84 chlorhexidine) were randomized to body cleansing with chlorhexidine
+gluconate or to routine bathing care with soap. The primary endpoint
+is time to staphylococcus infection (`T3`/`D3`). Baseline covariates
+include sex (`Z2`), race (`Z3`), percentage of body surface burned
+(`Z4`), location of the burn (head/buttock/trunk/upper-leg/lower-leg/
+respiratory: `Z5`–`Z10`), and type of burn (`Z11`).
+
+```{r, message = FALSE}
+data(burn, package = 'iBST')
+
+iBST_burn <-
+  pated(
+    coxph_(Surv(time = T3, event = D3) ~ Z1, data_index = 1),
+    glm_(Z2 ~ Z1, family = "binomial", data_index = 1),
+    glm_(Z3 ~ Z1, family = "binomial", data_index = 1),
+    glm_(Z5 ~ Z1, family = "binomial", data_index = 1),
+    glm_(Z6 ~ Z1, family = "binomial", data_index = 1),
+    glm_(Z7 ~ Z1, family = "binomial", data_index = 1),
+    glm_(Z8 ~ Z1, family = "binomial", data_index = 1),
+    glm_(Z9 ~ Z1, family = "binomial", data_index = 1),
+    glm_(Z10 ~ Z1, family = "binomial", data_index = 1),
+    glm_(I(Z11 == 1) ~ Z1, family = "binomial", data_index = 1),
+    glm_(I(Z11 == 2) ~ Z1, family = "binomial", data_index = 1),
+    glm_(I(Z11 == 3) ~ Z1, family = "binomial", data_index = 1),
+    glm_(Z4 ~ Z1, family = "gaussian", data_index = 1),
+    data = list(add_pid(burn))
+  )
+
+printObject(iBST_burn)
+plot(iBST_burn)
+```
+
+## Oropharyngeal carcinoma: `invGauss::d.oropha.rec`
+
+The `d.oropha.rec` data describe time to recurrence in 192 patients
+with oropharyngeal carcinoma (98 on regimen 1, 94 on regimen 2) who
+were randomized between two treatment regimens (`treatm`). Available
+baseline covariates are sex, age, T-stage, and N-stage.
+
+```{r, message = FALSE}
+data(d.oropha.rec, package = 'invGauss')
+
+invGauss_d.oropha.rec <-
+  pated(
+    coxph_(Surv(time = time, event = status) ~ treatm, data_index = 1),
+    glm_(I(sex == 1) ~ treatm, family = "gaussian", data_index = 1),
+    glm_(age         ~ treatm, family = "gaussian", data_index = 1),
+    glm_(tstage      ~ treatm, family = "gaussian", data_index = 1),
+    glm_(nstage      ~ treatm, family = "gaussian", data_index = 1),
+    data = list(add_pid(d.oropha.rec %>%
+                          mutate(treatm = ifelse(treatm == 2, 1, 0))))
+  )
+
+printObject(invGauss_d.oropha.rec)
+plot(invGauss_d.oropha.rec)
+```
+
+## ddI vs. ddC in advanced HIV: `JM::aids.id`
+
+Abrams et al. (1994, *NEJM*) randomized HIV-infected patients who had
+failed or were intolerant to zidovudine (AZT) to didanosine (ddI) or
+zalcitabine (ddC). `aids.id` is the patient-level (one row per
+subject) form distributed with the `JM` package and contains 467
+subjects (237 ddC, 230 ddI). The endpoint is time to death, and the
+baseline covariates used here are CD4 count, sex, prior opportunistic
+infection status, and AZT history (failure vs. intolerance).
+
+```{r, message = FALSE}
+data(aids.id, package = 'JM')
+
+JM_aids.id <-
+  pated(
+    coxph_(Surv(time = Time, event = death) ~ drug, data_index = 1),
+    glm_(CD4    ~ drug, family = "gaussian", data_index = 1),
+    glm_(gender ~ drug, family = "binomial", data_index = 1),
+    glm_(I(prevOI == 'AIDS')        ~ drug, family = "binomial", data_index = 1),
+    glm_(I(AZT  == 'intolerance')   ~ drug, family = "binomial", data_index = 1),
+    data = list(add_pid(aids.id %>%
+                          mutate(drug = ifelse(drug == 'ddC', 1, 0))))
+  )
+
+printObject(JM_aids.id)
+plot(JM_aids.id)
+```
+
+## ACTG 320 antiretroviral trial: `multipleOutcomes::actg`
+
+The `actg` dataset, redistributed with `multipleOutcomes` from the
+`mlr3proba` package, corresponds to the ACTG 320 trial (Hammer et al.,
+1997, *NEJM*), in which patients with CD4 counts below 200 were
+randomized to a three-drug regimen (zidovudine + lamivudine +
+indinavir) or to a two-drug control. The redistributed file contains
+1151 patients (577 control, 574 three-drug). The composite endpoint
+here is time to an AIDS-defining event or death, derived from the
+`censor` and `censor_d` indicators. Baseline covariates include
+stratification factor, sex, IV-drug history, race/ethnicity,
+hemophilia, Karnofsky score, CD4 count, prior ZDV exposure, and age.
+
+```{r, message = FALSE}
+data(actg, package = 'multipleOutcomes')
+
+mlr3proba_actg <-
+  pated(
+    coxph_(Surv(time = time, event = event) ~ tx, data_index = 1),
+    glm_(strat2 ~ tx, family = "binomial", data_index = 1),
+    glm_(sex    ~ tx, family = "binomial", data_index = 1),
+    glm_(I(ivdrug == 1) ~ tx, family = "binomial", data_index = 1),
+    glm_(I(raceth == 1) ~ tx, family = "binomial", data_index = 1),
+    glm_(I(raceth == 2) ~ tx, family = "binomial", data_index = 1),
+    glm_(I(raceth == 3) ~ tx, family = "binomial", data_index = 1),
+    glm_(hemophil       ~ tx, family = "binomial", data_index = 1),
+    glm_(I(karnof == 100) ~ tx, family = "binomial", data_index = 1),
+    glm_(I(karnof == 90)  ~ tx, family = "binomial", data_index = 1),
+    glm_(I(karnof == 80)  ~ tx, family = "binomial", data_index = 1),
+    glm_(I(karnof == 70)  ~ tx, family = "binomial", data_index = 1),
+    glm_(cd4      ~ tx, family = "gaussian", data_index = 1),
+    glm_(priorzdv ~ tx, family = "gaussian", data_index = 1),
+    glm_(age      ~ tx, family = "gaussian", data_index = 1),
+    data = list(add_pid(actg %>%
+                          mutate(event = 1 * (censor + censor_d > 0))))
+  )
+
+printObject(mlr3proba_actg)
+plot(mlr3proba_actg)
+```
+
+## PBC3 cyclosporin A trial: `pec::Pbc3`
+
+The PBC3 trial was a European multicentre randomized study (1983–1987)
+comparing cyclosporin A (CyA) with placebo in 349 patients with
+primary biliary cirrhosis (173 placebo, 176 CyA). The endpoint
+analysed here is time to death or liver transplantation. Baseline
+covariates include sex, histological stage, history of gastrointestinal
+bleeding, age, and the biochemistry panel (creatinine, bilirubin,
+alkaline phosphatase, aspartate transaminase, weight).
+
+```{r, message = FALSE}
+data(Pbc3, package = 'pec')
+
+pec_Pbc3 <-
+  pated(
+    coxph_(Surv(time = days, event = event) ~ tment, data_index = 1),
+    glm_(sex                 ~ tment, family = "binomial", data_index = 1),
+    glm_(I(stage == 1)       ~ tment, family = "binomial", data_index = 1),
+    glm_(I(stage == 2)       ~ tment, family = "binomial", data_index = 1),
+    glm_(I(stage == 3)       ~ tment, family = "binomial", data_index = 1),
+    glm_(I(stage == 4)       ~ tment, family = "binomial", data_index = 1),
+    glm_(gibleed             ~ tment, family = "binomial", data_index = 1),
+    glm_(age                 ~ tment, family = "gaussian", data_index = 1),
+    glm_(crea                ~ tment, family = "gaussian", data_index = 1),
+    glm_(bili                ~ tment, family = "gaussian", data_index = 1),
+    glm_(alkph               ~ tment, family = "gaussian", data_index = 1),
+    glm_(asptr               ~ tment, family = "gaussian", data_index = 1),
+    glm_(weight              ~ tment, family = "gaussian", data_index = 1),
+    data = list(add_pid(Pbc3 %>%
+                          mutate(event = ifelse(status == 0, 0, 1))))
+  )
+
+printObject(pec_Pbc3)
+plot(pec_Pbc3)
+```
+
+## GBSG-2 adjuvant breast-cancer trial: `pec::GBSG2`
+
+The German Breast Cancer Study Group 2 trial (Schumacher et al.,
+1994) randomized 686 women with node-positive primary breast cancer
+(440 without hormonal therapy, 246 with tamoxifen) in a 2x2 factorial
+of adjuvant hormonal therapy (tamoxifen, `horTh`) and chemotherapy
+duration. The endpoint is recurrence-free survival; baseline
+covariates include tumour size, number of positive lymph nodes,
+progesterone receptor level, and tumour grade.
+
+```{r, message = FALSE}
+data(GBSG2, package = 'pec')
+
+pec_GBSG2 <-
+  pated(
+    coxph_(Surv(time = time, event = cens) ~ horTh, data_index = 1),
+    glm_(tsize    ~ horTh, family = "gaussian", data_index = 1),
+    glm_(pnodes   ~ horTh, family = "gaussian", data_index = 1),
+    glm_(progrec  ~ horTh, family = "gaussian", data_index = 1),
+    glm_(I(tgrade == 'I')   ~ horTh, family = "binomial", data_index = 1),
+    glm_(I(tgrade == 'II')  ~ horTh, family = "binomial", data_index = 1),
+    glm_(I(tgrade == 'III') ~ horTh, family = "binomial", data_index = 1),
+    data = list(add_pid(GBSG2 %>%
+                          mutate(horTh = ifelse(horTh == 'yes', 1, 0))))
+  )
+
+printObject(pec_GBSG2)
+plot(pec_GBSG2)
+```
+
+## Interpreting the output
+
+For each trial, the printed table shows the adjusted PATED estimate
+and the unadjusted Standard estimate of the treatment effect on the
+primary endpoint, each with its standard error and two-sided p-value,
+followed by one row per prognostic covariate. The `relativeEfficiency()`
+helper turns the two standard errors into a single RE summary, and the
+`plot()` method converts every row into a Wald z-statistic for a
+visual diagnostic.
+
+Read the two views together: the spread of the gray prognostic
+z-values shows how well randomization balanced the covariates, while
+the gap between the blue (unadjusted) and red (PATED) points
+illustrates the variance reduction that the RE value quantifies. RE
+close to 1 means the baseline covariates carried little prognostic
+information beyond what randomization already balanced; RE
+appreciably above 1 indicates a meaningful efficiency gain.
+
+## References
+
+- Abrams DI, Goldman AI, Launer C, et al. (1994). A comparative trial
+  of didanosine or zalcitabine after treatment with zidovudine in
+  patients with human immunodeficiency virus infection. *NEJM* 330:
+  657–662.
+- Grana C, Chinol M, Robertson C, et al. (2002). Pretargeted adjuvant
+  radioimmunotherapy with yttrium-90-biotin in malignant glioma
+  patients: a pilot study. *British Journal of Cancer* 86: 207–212.
+- Hammer SM, Squires KE, Hughes MD, et al. (1997). A controlled trial
+  of two nucleoside analogues plus indinavir in persons with human
+  immunodeficiency virus infection and CD4 cell counts of 200 per
+  cubic millimeter or less. *NEJM* 337: 725–733.
+- Klein JP, Moeschberger ML (1997). *Survival Analysis: Techniques
+  for Censored and Truncated Data*. Springer.
+- Schumacher M, Bastert G, Bojar H, et al. (1994). Randomized
+  2x2 trial evaluating hormonal treatment and the duration of
+  chemotherapy in node-positive breast cancer patients. *Journal of
+  Clinical Oncology* 12: 2086–2093.
+- Steinberg MB, Greenhaus S, Schmelzer AC, et al. (2009).
+  Triple-combination pharmacotherapy for medically ill smokers.
+  *Annals of Internal Medicine* 150: 447–454.
