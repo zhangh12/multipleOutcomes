@@ -7,8 +7,8 @@ Description: Fits generalized linear models, Cox proportional-hazards
     models, log-rank tests, generalized estimating equations, mixed models
     with repeated measures, Kaplan-Meier curves, and quantile differences
     jointly across multiple endpoints, and returns the full asymptotic
-    covariance matrix linking them. Implements PATED (Prognostic Variables
-    Assisted Treatment Effect Detection), a randomized-trial method that
+    covariance matrix linking them. Implements PATED (Prognostic Assisted 
+    Treatment Effect Detection), a randomized-trial method that
     exploits balanced prognostic covariates to tighten standard errors and
     increase statistical power without introducing bias.
 URL: https://github.com/zhangh12/multipleOutcomes, https://zhangh12.github.io/multipleOutcomes/
