@@ -2,4 +2,5 @@
 
 ### All vignettes
 
-- [test](https://zhangh12.github.io/multipleOutcomes/articles/test.md):
+- [PATED: Prognostic-Assisted Treatment Effect Detection in Randomized
+  Trials](https://zhangh12.github.io/multipleOutcomes/articles/pated.md):
