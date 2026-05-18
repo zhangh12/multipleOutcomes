@@ -10,13 +10,13 @@ Source:
 [`DESCRIPTION`](https://github.com/zhangh12/multipleOutcomes/blob/main/DESCRIPTION)
 
 Zhang H (2026). *multipleOutcomes: Joint Covariance and Treatment-Effect
-Tests for Multiple Outcomes*. R package version 0.16.3,
+Tests for Multiple Outcomes*. R package version 0.16.4,
 <https://github.com/zhangh12/multipleOutcomes>.
 
     @Manual{,
       title = {multipleOutcomes: Joint Covariance and Treatment-Effect Tests for Multiple Outcomes},
       author = {Han Zhang},
       year = {2026},
-      note = {R package version 0.16.3},
+      note = {R package version 0.16.4},
       url = {https://github.com/zhangh12/multipleOutcomes},
     }
