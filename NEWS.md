@@ -1,3 +1,14 @@
+# multipleOutcomes 0.16.4
+
+## Tests
+
+* New `test-inplace-formula.R` verifies that in-place formula
+  transformations (`I(z > 4)`, `log(x)`, `scale(x)`, `factor(x)`,
+  `Surv(t / c, 1 - cnsr)`, multi-variable Boolean expressions, and
+  LHS arithmetic) produce numerically identical PATED output to the
+  pre-computed-column equivalents, across `coxph_()` primaries and
+  `glm_()` prognostic specs.
+
 # multipleOutcomes 0.16
 
 ## Breaking changes

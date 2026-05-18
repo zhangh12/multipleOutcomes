@@ -1,6 +1,6 @@
 Package: multipleOutcomes
 Title: Joint Covariance and Treatment-Effect Tests for Multiple Outcomes
-Version: 0.16.3
+Version: 0.16.4
 Authors@R:
     person("Han", "Zhang", , "zhangh.ustc@gmail.com", role = c("aut", "cre"))
 Description: Fits generalized linear models, Cox proportional-hazards
