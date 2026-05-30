@@ -116,6 +116,35 @@ sim_correlated_multi <- function(n_subj    = 250,
   list(wide = wide, long = long)
 }
 
+# Two-arm trial with three endpoints (OS, PFS, continuous) plus two
+# prognostic covariates (x1, x2) that confound the survival and continuous
+# outcomes. Used by the MC cross-engine test for netbenefit_ + glm_: x1
+# and x2 push os/pfs/y in the same direction as the treatment-driven
+# imbalance, so the joint covariance between the net-benefit "arm" entry
+# and the x1~arm / x2~arm coefficients is non-zero by construction.
+sim_netbenefit <- function(n_per_arm = 200,
+                           b_pfs_trt = log(0.78),
+                           b_os_trt  = log(0.85),
+                           y_mean_trt = 0.3,
+                           seed      = NULL) {
+  if (!is.null(seed)) set.seed(seed)
+  rng <- function(n, b_pfs, b_os, y_mean) {
+    x1  <- rnorm(n, 0, 1.5); x2 <- rnorm(n, 0, 1.5)
+    pfs <- -log(runif(n)) / (log(2) / 5  * exp(b_pfs + x1 + x2))
+    os  <- -log(runif(n)) / (log(2) / 10 * exp(b_os  + x1 + x2))
+    y   <- rnorm(n, mean = y_mean + x1 + x2)
+    data.frame(pfs = pfs, pfs_event = 1L,
+               os  = os,  os_event  = 1L,
+               y = y, x1 = x1, x2 = x2)
+  }
+  dat <- rbind(
+    cbind(arm = 0L, rng(n_per_arm, log(1.0), log(1.0), 0.0)),
+    cbind(arm = 1L, rng(n_per_arm, b_pfs_trt, b_os_trt, y_mean_trt))
+  )
+  dat$pid <- paste0("p", seq_len(nrow(dat)))
+  dat
+}
+
 # Repeated measurements with within-subject AR(1) correlation.
 # Returns one row per (subject, visit) with `pid` as the cluster id.
 sim_repeated <- function(n_subj = 120,

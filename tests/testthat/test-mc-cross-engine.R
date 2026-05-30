@@ -123,3 +123,39 @@ test_that("MC: kitchen-sink (glm-gaussian, glm-binomial, coxph, gee) is calibrat
                    label = "kitchen-sink")
   expect_nontrivial_cross_cor(cov(res$beta_hat), label = "(kitchen-sink)")
 })
+
+# ---------------------------------------------------------------------------
+# netbenefit_ + glm_: hierarchical U-statistic primary + two confounded
+# prognostic covariates. Regression for the sign bug discovered while
+# wiring up NetBenefitAdapter — without negating the stored IF the
+# cross-block bread1 %*% cov(score1,score2) %*% t(bread2) carries the
+# wrong sign relative to Cov(estimate_1, estimate_2), and the empirical
+# off-diagonals here would land on the opposite side of zero.
+test_that("MC: netbenefit_ + glm_ cross-engine covariance is calibrated", {
+  skip_on_cran()
+  skip_if_not(mc_enabled(),
+              "set MULTIPLEOUTCOMES_RUN_MC=1 to run Monte Carlo tests")
+  K <- 200; n_per_arm <- 200
+
+  res <- mc_run(
+    K,
+    simulate = function(k) sim_netbenefit(n_per_arm = n_per_arm,
+                                          seed = 12000L + k),
+    fit_fn   = function(dat) jointCovariance(
+      netbenefit_(net_benefit ~ arm,
+                  endpoints = list(
+                    nb_tte("os",  "os_event"),
+                    nb_tte("pfs", "pfs_event"),
+                    nb_continuous("y")
+                  )),
+      glm_(x1 ~ arm, family = "gaussian"),
+      glm_(x2 ~ arm, family = "gaussian"),
+      data = dat
+    )
+  )
+  expect_cov_close(cov(res$beta_hat), res$vcov_mean,
+                   rel_diag = 0.30, abs_offdiag = 0.05,
+                   label = "netbenefit x glm")
+  expect_nontrivial_cross_cor(cov(res$beta_hat),
+                              label = "(netbenefit x glm)")
+})

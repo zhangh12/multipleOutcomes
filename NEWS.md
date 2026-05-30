@@ -1,3 +1,11 @@
+# multipleOutcomes 0.17.0
+
+## New features
+
+* `netbenefit_()` adapter for the hierarchical net-benefit (win-difference)
+  statistic, with endpoints built by `nb_tte()`, `nb_continuous()`, or
+  `nb_binary()` and priority encoded by list order.
+
 # multipleOutcomes 0.16.4
 
 ## Tests
