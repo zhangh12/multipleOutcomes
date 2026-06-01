@@ -25,6 +25,8 @@ NetBenefitAdapter <- R6::R6Class(
              call. = FALSE)
       }
 
+      private$warn_if_endpoints_have_na(dat, spec$endpoints)
+
       out <- compute_netbenefit(dat[idx0, , drop = FALSE],
                                 dat[idx1, , drop = FALSE],
                                 spec$endpoints)
@@ -96,6 +98,32 @@ NetBenefitAdapter <- R6::R6Class(
              'values (found ', length(levs), '). ', call. = FALSE)
       }
       levs
+    },
+
+    ## NAs in endpoint columns aren't fatal — comp_pair() treats them as
+    ## "tied at this level, fall through" — but they silently shrink the
+    ## effective number of decided pairs at affected endpoints. Warn the
+    ## user once per fit so the missingness isn't invisible.
+    warn_if_endpoints_have_na = function(dat, endpoints) {
+      affected <- character(0)
+      for (r in endpoints) {
+        cols <- if (r$type == "tte") c(r$time, r$event) else r$value
+        for (cn in cols) {
+          if (cn %in% names(dat) && anyNA(dat[[cn]])) {
+            affected <- c(affected, cn)
+          }
+        }
+      }
+      if (length(affected)) {
+        warning(
+          "netbenefit_(): NAs found in endpoint column(s) ",
+          paste(shQuote(unique(affected)), collapse = ", "),
+          ". Pairs with NA at an endpoint are treated as tied at that ",
+          "level and fall through to the next; affected pairs that ",
+          "reach the last endpoint contribute as full ties.",
+          call. = FALSE
+        )
+      }
     }
   )
 )

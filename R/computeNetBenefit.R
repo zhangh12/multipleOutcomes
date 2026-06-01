@@ -54,6 +54,9 @@ compute_netbenefit <- function(data0, data1, endpoints) {
       if (types[k] == "tte") {
         t0 <- c0$time[i];  e0 <- c0$event[i]
         t1 <- c1$time[j];  e1 <- c1$event[j]
+        ## NA in time or event for either subject -> can't decide this
+        ## endpoint; treat as tied at this level and fall through.
+        if (is.na(t0) || is.na(t1) || is.na(e0) || is.na(e1)) next
         if (e0 == 1L && e1 == 1L) {
           gap <- d * (t1 - t0)
           if (gap >  m) return( 1L)
@@ -74,6 +77,8 @@ compute_netbenefit <- function(data0, data1, endpoints) {
       } else {
         v0 <- c0$value[i]
         v1 <- c1$value[j]
+        ## NA on either side -> tie at this level, fall through.
+        if (is.na(v0) || is.na(v1)) next
         gap <- d * (v1 - v0)
         if (gap >  m) return( 1L)
         if (gap < -m) return(-1L)

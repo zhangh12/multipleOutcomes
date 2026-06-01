@@ -1,3 +1,9 @@
+# multipleOutcomes 0.17.1
+
+* `netbenefit_()` now treats NA in any endpoint column as "tied at that
+  level, fall through" rather than erroring deep in the U-statistic
+  loop, and warns once per fit listing the affected columns.
+
 # multipleOutcomes 0.17.0
 
 ## New features

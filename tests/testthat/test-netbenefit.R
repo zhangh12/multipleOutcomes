@@ -117,6 +117,138 @@ test_that("per-subject IF is centered at zero", {
 })
 
 # ---------------------------------------------------------------------------
+# Score rows must stay aligned with `dat` rows under arbitrary row order.
+# Regression for a class of bugs where a future refactor of
+# compute_netbenefit() or NetBenefitAdapter$fit_model() introduces a row
+# reordering that isn't mirrored when the per-subject IF is scattered back
+# into the n × 1 score matrix.
+
+test_that("score rows align with dat rows under arbitrary permutations", {
+  base <- make_nb_data(n_per_arm = 30, seed = 1L)
+  spec <- netbenefit_(net_benefit ~ arm, endpoints = std_endpoints())
+
+  fit_once <- function(d) {
+    a <- multipleOutcomes:::NetBenefitAdapter$new(spec, d); a$fit_model()
+    a$get_score()
+  }
+
+  ## Original (block-sorted arm) order.
+  s_blk <- fit_once(base)
+  expect_identical(rownames(s_blk), base$pid)
+
+  ## Random row permutation.
+  set.seed(42)
+  perm <- sample(nrow(base))
+  d_perm <- base[perm, ]
+  s_perm <- fit_once(d_perm)
+  expect_identical(rownames(s_perm), d_perm$pid)
+
+  ## Per-pid IFs must be identical between the two orderings.
+  align <- function(s) s[order(rownames(s)), , drop = FALSE]
+  expect_equal(unname(align(s_blk)), unname(align(s_perm)),
+               tolerance = 1e-12)
+
+  ## Arm-interleaved order (worst case for any silent block-sort assumption).
+  d_int <- base[order(seq_len(nrow(base)) %% 2), ]
+  s_int <- fit_once(d_int)
+  expect_identical(rownames(s_int), d_int$pid)
+  expect_equal(unname(align(s_blk)), unname(align(s_int)),
+               tolerance = 1e-12)
+})
+
+# ---------------------------------------------------------------------------
+# NA in endpoint columns is non-fatal: comp_pair() treats it as "tied at
+# this level, fall through to the next." The adapter warns once per fit
+# so the missingness isn't silent.
+
+test_that("NA in a continuous endpoint does not error and emits a warning", {
+  dat <- make_nb_data(n_per_arm = 30, seed = 11L)
+  dat$y[5] <- NA
+  spec <- netbenefit_(net_benefit ~ arm,
+                      endpoints = list(nb_continuous("y")))
+  expect_warning(
+    fit <- jointCovariance(spec, data = dat),
+    "NAs found in endpoint column.*'y'"
+  )
+  expect_true(is.finite(coef(fit)))
+  expect_true(vcov(fit)[1, 1] > 0)
+})
+
+test_that("NA in a TTE time column does not error and emits a warning", {
+  dat <- make_nb_data(n_per_arm = 30, seed = 12L)
+  dat$pfs[3] <- NA
+  spec <- netbenefit_(net_benefit ~ arm,
+                      endpoints = list(nb_tte("os",  "os_event"),
+                                       nb_tte("pfs", "pfs_event"),
+                                       nb_continuous("y")))
+  expect_warning(
+    fit <- jointCovariance(spec, data = dat),
+    "NAs found in endpoint column.*'pfs'"
+  )
+  expect_true(is.finite(coef(fit)))
+})
+
+test_that("NA at endpoint k is equivalent to that subject tying at k", {
+  ## Equivalence: a row with NA at endpoint k behaves the same as a row
+  ## whose value at k is the *exact same* as the partner's value (so
+  ## every pair involving that row ties at k). We can't reach that
+  ## exact equivalence on a 2D dataset because each NA-row pairs with n
+  ## different partners, but we CAN reach a stronger equivalence on the
+  ## single-endpoint case: with K = 1 endpoint, NA at row i means
+  ## row i contributes 0 to every pair, so the estimate must equal the
+  ## one computed after dropping row i from BOTH the numerator and the
+  ## denominator's pair count.
+  ##
+  ## Concretely: estimate-with-NA == (N_W' - N_L') / (n_C * n_T),
+  ## where (N_W', N_L') count only pairs NOT involving the NA-row.
+  set.seed(99); n <- 30
+  dat <- data.frame(
+    pid = paste0("p", seq_len(n)),
+    arm = rep(0:1, each = n/2),
+    y   = rnorm(n)
+  )
+  na_row <- 7L                          # a control-arm row
+  dat_na <- dat; dat_na$y[na_row] <- NA
+
+  spec <- netbenefit_(net_benefit ~ arm,
+                      endpoints = list(nb_continuous("y")))
+  fit_full <- jointCovariance(spec, data = dat)
+
+  ## Suppress the (expected) warning from the NA fit.
+  fit_na <- suppressWarnings(jointCovariance(spec, data = dat_na))
+
+  ## Manual reference: drop the NA-row entirely from the pair grid by
+  ## setting its 'y' to a value that ties with every treatment subject
+  ## — impossible in general, so instead we compare against the kernel
+  ## sum we expect: the same numerator as fit_full minus the contribution
+  ## of pairs (na_row, j), all divided by the SAME denominator nC*nT.
+  d0 <- dat[dat$arm == 0L, ]; d1 <- dat[dat$arm == 1L, ]
+  nC <- nrow(d0); nT <- nrow(d1)
+  na_row_in_d0 <- which(d0$pid == dat$pid[na_row])
+  comp <- function(v0, v1) sign(v1 - v0)            # +1 if treatment wins
+  ψ_full <- outer(d0$y, d1$y, comp)
+  ψ_na   <- ψ_full
+  ψ_na[na_row_in_d0, ] <- 0                          # NA-row ties everyone
+  expect_equal(unname(coef(fit_full)), sum(ψ_full) / (nC * nT),
+               tolerance = 1e-12, label = "full reference")
+  expect_equal(unname(coef(fit_na)),   sum(ψ_na)   / (nC * nT),
+               tolerance = 1e-12, label = "NA-as-tie equivalence")
+})
+
+test_that("score rows still align with dat rows when NAs are present", {
+  base <- make_nb_data(n_per_arm = 30, seed = 1L)
+  base$y[c(2, 17)] <- NA
+  spec <- netbenefit_(net_benefit ~ arm, endpoints = std_endpoints())
+
+  ad <- multipleOutcomes:::NetBenefitAdapter$new(spec, base)
+  suppressWarnings(ad$fit_model())
+  s <- ad$get_score()
+  expect_identical(rownames(s), base$pid)
+  ## IF column-sum still zero (BaseAdapter contract).
+  expect_lt(max(abs(colSums(s) / nrow(s))), 1e-10)
+})
+
+# ---------------------------------------------------------------------------
 # Cross-engine off-diagonal block is populated and non-trivial: cheap
 # single-dataset sanity check that catches "off-diagonal silently zero"
 # bugs without going through Monte Carlo. The full empirical calibration
