@@ -1,5 +1,25 @@
 # Changelog
 
+## multipleOutcomes 0.17.1
+
+- [`netbenefit_()`](https://zhangh12.github.io/multipleOutcomes/reference/netbenefit_.md)
+  now treats NA in any endpoint column as “tied at that level, fall
+  through” rather than erroring deep in the U-statistic loop, and warns
+  once per fit listing the affected columns.
+
+## multipleOutcomes 0.17.0
+
+### New features
+
+- [`netbenefit_()`](https://zhangh12.github.io/multipleOutcomes/reference/netbenefit_.md)
+  adapter for the hierarchical net-benefit (win-difference) statistic,
+  with endpoints built by
+  [`nb_tte()`](https://zhangh12.github.io/multipleOutcomes/reference/nb_endpoint.md),
+  [`nb_continuous()`](https://zhangh12.github.io/multipleOutcomes/reference/nb_endpoint.md),
+  or
+  [`nb_binary()`](https://zhangh12.github.io/multipleOutcomes/reference/nb_endpoint.md)
+  and priority encoded by list order.
+
 ## multipleOutcomes 0.16.4
 
 ### Tests

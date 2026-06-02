@@ -219,6 +219,19 @@ or
   : Creating Objects of Kaplan-Meier Curve
 - [`quantile_()`](https://zhangh12.github.io/multipleOutcomes/reference/quantile_.md)
   : Creating Objects of Group Quantile Differences
+- [`netbenefit_()`](https://zhangh12.github.io/multipleOutcomes/reference/netbenefit_.md)
+  : Creating Objects of Hierarchical Net-Benefit (Win-Difference)
+  Statistic
+
+## Net-benefit endpoints
+
+Endpoint constructors describing the hierarchical outcomes compared by
+[`netbenefit_()`](https://zhangh12.github.io/multipleOutcomes/reference/netbenefit_.md).
+
+- [`nb_tte()`](https://zhangh12.github.io/multipleOutcomes/reference/nb_endpoint.md)
+  [`nb_continuous()`](https://zhangh12.github.io/multipleOutcomes/reference/nb_endpoint.md)
+  [`nb_binary()`](https://zhangh12.github.io/multipleOutcomes/reference/nb_endpoint.md)
+  : Endpoint Constructors for netbenefit\_()
 
 ## Extracting results
 
