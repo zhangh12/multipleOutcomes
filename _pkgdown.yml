@@ -27,6 +27,14 @@ reference:
       - mmrm_
       - km_
       - quantile_
+      - netbenefit_
+
+  - title: Net-benefit endpoints
+    desc: >
+      Endpoint constructors describing the hierarchical outcomes compared by
+      `netbenefit_()`.
+    contents:
+      - nb_endpoint
 
   - title: Extracting results
     contents:
