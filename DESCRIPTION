@@ -1,17 +1,17 @@
 Package: multipleOutcomes
 Title: Joint Covariance and Treatment-Effect Tests for Multiple Outcomes
-Version: 0.17.1
+Version: 0.18.0
 Authors@R:
     person("Han", "Zhang", , "zhangh.ustc@gmail.com", role = c("aut", "cre"))
 Description: Fits generalized linear models, Cox proportional-hazards
     models, log-rank tests, generalized estimating equations, mixed models
     with repeated measures, Kaplan-Meier curves, quantile differences, and
-    hierarchical net-benefit (win-difference) statistics jointly across
-    multiple endpoints, and returns the full asymptotic covariance matrix
-    linking them. Implements PATED (Prognostic Assisted Treatment Effect
-    Detection), a randomized-trial method that exploits balanced prognostic
-    covariates to tighten standard errors and increase statistical power
-    without introducing bias.
+    hierarchical net-benefit (win-difference) and log win-ratio statistics
+    jointly across multiple endpoints, and returns the full asymptotic
+    covariance matrix linking them. Implements PATED (Prognostic Assisted
+    Treatment Effect Detection), a randomized-trial method that exploits
+    balanced prognostic covariates to tighten standard errors and increase
+    statistical power without introducing bias.
 URL: https://github.com/zhangh12/multipleOutcomes, https://zhangh12.github.io/multipleOutcomes/
 BugReports: https://github.com/zhangh12/multipleOutcomes/issues
 License: MIT + file LICENSE

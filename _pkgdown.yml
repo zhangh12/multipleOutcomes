@@ -28,6 +28,7 @@ reference:
       - km_
       - quantile_
       - netbenefit_
+      - winratio_
 
   - title: Net-benefit endpoints
     desc: >

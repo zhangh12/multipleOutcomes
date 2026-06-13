@@ -15,9 +15,10 @@ pated(
 }
 \arguments{
 \item{...}{model specifications built by \code{glm_()}, \code{coxph_()}, \code{logrank_()},
-\code{gee_()}, \code{mmrm_()}, \code{km_()}, or \code{quantile_()}. The first specification is
-the primary outcome whose treatment effect is being tested; the rest are
-prognostic covariates used to tighten the SE.}
+\code{gee_()}, \code{mmrm_()}, \code{km_()}, \code{quantile_()}, \code{netbenefit_()}, or
+\code{winratio_()}. The first specification is the primary outcome whose
+treatment effect is being tested; the rest are prognostic covariates used
+to tighten the SE.}
 
 \item{data}{either a single data frame (when all models are fitted on
 the same dataset) or a list of data frames (one entry per \code{data_index}).

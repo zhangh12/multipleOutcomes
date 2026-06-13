@@ -1,11 +1,10 @@
-#' Creating Objects of Hierarchical Net-Benefit (Win-Difference) Statistic
+#' Creating Objects of Hierarchical Log Win-Ratio Statistic
 #'
 #' @description
-#' `netbenefit_` creates an object to be passed into `jointCovariance` or
+#' `winratio_` creates an object to be passed into `jointCovariance` or
 #' `pated` through its `...` argument. The object defines a hierarchical
-#' net-benefit (a.k.a. win-difference, proportion-in-favor) statistic
-#' across a list of endpoints, each declared by `nb_tte()`,
-#' `nb_continuous()`, or `nb_binary()`.
+#' win-ratio statistic across a list of endpoints, each declared by
+#' `nb_tte()`, `nb_continuous()`, or `nb_binary()`.
 #'
 #' @param formula a two-sided R formula `<label> ~ arm`. The LHS is used
 #'   purely as a row label in `pated()` output; the RHS must contain exactly
@@ -18,38 +17,42 @@
 #'   argument of `jointCovariance` to be used.
 #'
 #' @details
-#' The estimator is
-#' \deqn{\widehat\Delta = \frac{N_W - N_L}{N_W + N_L + N_T}}
-#' where \eqn{N_W}, \eqn{N_L}, and \eqn{N_T} are the numbers of treatment
-#' wins, losses, and overall ties across all \eqn{n_C \times n_T} pairs
-#' (control vs. treatment subject). The per-subject influence function is
-#' available in closed form, so both the asymptotic and the bootstrap paths
-#' of `jointCovariance` are supported.
+#' The fitted coefficient is on the log scale:
+#' \deqn{\widehat\theta = \log(\widehat{WR})
+#'       = \log(\widehat\pi_W / \widehat\pi_L)}
+#' where \eqn{\widehat\pi_W} and \eqn{\widehat\pi_L} are the proportions of
+#' all control-treatment pairs where the treatment subject wins or loses,
+#' respectively. Tied pairs remain in the denominator of both proportions
+#' but do not contribute to either numerator.
+#'
+#' The raw win ratio can be recovered by exponentiating the coefficient.
+#' The log scale is used because it gives the standard large-sample Wald
+#' representation and maps the null win ratio of 1 to 0.
 #'
 #' The arm reference level is inferred from the arm column the same way
 #' `model.matrix(~ arm)` would: `levels(arm)[1]` for factor, the smaller
 #' value for numeric or logical, and the alphabetically first value for
 #' character. To override, convert the column to a factor with the desired
-#' level order before calling `netbenefit_()`.
+#' level order before calling `winratio_()`.
 #'
-#' @return An object of class `c("jc_spec_netbenefit", "jc_spec")`.
+#' @return An object of class `c("jc_spec_winratio", "jc_spec")`.
 #'
 #' @seealso [nb_tte()], [nb_continuous()], [nb_binary()], [jointCovariance()],
 #'   [pated()].
 #' @export
-netbenefit_ <- function(formula, endpoints, data_index = 1) {
+winratio_ <- function(formula, endpoints, data_index = 1) {
 
   if (!inherits(formula, "formula") || length(formula) != 3L) {
-    stop('"formula" in netbenefit_ must be a two-sided R formula like ',
-         '`net_benefit ~ arm`.', call. = FALSE)
+    stop('"formula" in winratio_ must be a two-sided R formula like ',
+         '`log_win_ratio ~ arm`.', call. = FALSE)
   }
   rhs_vars <- all.vars(formula[[3L]])
   if (length(rhs_vars) != 1L) {
-    stop('"formula" in netbenefit_ must have exactly one RHS variable like ',
-         '`net_benefit ~ arm`.', call. = FALSE)
+    stop('"formula" in winratio_ must have exactly one RHS variable like ',
+         '`log_win_ratio ~ arm`.', call. = FALSE)
   }
   if (!is.list(endpoints) || length(endpoints) == 0L) {
-    stop('"endpoints" in netbenefit_ must be a non-empty list of nb_tte() / ',
+    stop('"endpoints" in winratio_ must be a non-empty list of nb_tte() / ',
          'nb_continuous() / nb_binary() specs.', call. = FALSE)
   }
   bad <- !vapply(endpoints, inherits, logical(1), "nb_endpoint")
@@ -64,13 +67,13 @@ netbenefit_ <- function(formula, endpoints, data_index = 1) {
 
   structure(
     list(
-      engine     = "netbenefit",
+      engine     = "winratio",
       formula    = formula,
       outcome    = outcome,
       endpoints  = endpoints,
       data_index = data_index,
       id_col     = "pid"
     ),
-    class = c("jc_spec_netbenefit", "jc_spec")
+    class = c("jc_spec_winratio", "jc_spec")
   )
 }

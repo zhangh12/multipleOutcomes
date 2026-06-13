@@ -14,9 +14,10 @@
 #' @importFrom rlang .data
 #' 
 #' @param ... model specifications built by `glm_()`, `coxph_()`, `logrank_()`,
-#' `gee_()`, `mmrm_()`, `km_()`, or `quantile_()`. The first specification is
-#' the primary outcome whose treatment effect is being tested; the rest are
-#' prognostic covariates used to tighten the SE.
+#'   `gee_()`, `mmrm_()`, `km_()`, `quantile_()`, `netbenefit_()`, or
+#'   `winratio_()`. The first specification is the primary outcome whose
+#'   treatment effect is being tested; the rest are prognostic covariates used
+#'   to tighten the SE.
 #' @param data either a single data frame (when all models are fitted on
 #' the same dataset) or a list of data frames (one entry per `data_index`).
 #' Each data frame must have a `pid` column carrying subject identifiers;

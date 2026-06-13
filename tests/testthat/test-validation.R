@@ -47,6 +47,9 @@ test_that("every *_() constructor calls validate_data_index()", {
   expect_error(quantile_(y ~ arm, probs = c(.25, .5),
                          data_index = c(1L, 2L)),
                "positive integer scalar")
+  expect_error(winratio_(y ~ arm, endpoints = list(nb_continuous("y")),
+                         data_index = -1),
+               "positive integer scalar")
   # mmrm_ goes through additional validation (control checks) before reaching
   # the data_index check, so just verify the error still surfaces. mmrm is in
   # Imports so it's safe to require here.

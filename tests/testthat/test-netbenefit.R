@@ -35,6 +35,8 @@ test_that("netbenefit_() rejects bad inputs", {
                "two-sided R formula")
   expect_error(netbenefit_(~ arm, endpoints = std_endpoints()),
                "two-sided R formula")
+  expect_error(netbenefit_(y ~ arm + x, endpoints = std_endpoints()),
+               "exactly one RHS variable")
   expect_error(netbenefit_(y ~ arm, endpoints = list()),
                "non-empty list")
   expect_error(netbenefit_(y ~ arm, endpoints = "not a list"),

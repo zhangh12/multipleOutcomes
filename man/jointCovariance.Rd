@@ -8,8 +8,8 @@ Covariance}
 jointCovariance(..., data, nboot = 0, compute_cov = TRUE, seed = NULL)
 }
 \arguments{
-\item{...}{objects returned by \code{glm_()}, \code{coxph_()}, \code{logrank_()}, \code{gee_()}
-and \code{gmm_()}.}
+\item{...}{objects returned by \code{glm_()}, \code{coxph_()}, \code{logrank_()}, \code{gee_()},
+\code{mmrm_()}, \code{km_()}, \code{quantile_()}, \code{netbenefit_()}, or \code{winratio_()}.}
 
 \item{data}{a data frame if all models are fitted on the same dataset;
 otherwise a list of data frames for fitting models in \code{...}. Note that a

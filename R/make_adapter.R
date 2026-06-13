@@ -40,5 +40,9 @@ make_adapter <- function(spec, data_list){
     return(NetBenefitAdapter$new(spec, dat))
   }
 
+  if(inherits(spec, "jc_spec_winratio")){
+    return(WinRatioAdapter$new(spec, dat))
+  }
+
   stop("Unsupported spec type: ", paste(class(spec), collapse = ", "))
 }

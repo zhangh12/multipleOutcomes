@@ -5,8 +5,8 @@
 #' simultaneously and return model parameters and variance-covariance matrix 
 #' for further analysis. 
 #'
-#' @param ... objects returned by `glm_()`, `coxph_()`, `logrank_()`, `gee_()` 
-#' and `gmm_()`. 
+#' @param ... objects returned by `glm_()`, `coxph_()`, `logrank_()`, `gee_()`,
+#'   `mmrm_()`, `km_()`, `quantile_()`, `netbenefit_()`, or `winratio_()`.
 #' @param data a data frame if all models are fitted on the same dataset;
 #' otherwise a list of data frames for fitting models in `...`. Note that a
 #' dataset can be used to fit multiple models, thus, `length(data)` is unnecessary
@@ -135,5 +135,4 @@ jointCovariance <- function(..., data, nboot = 0, compute_cov = TRUE, seed = NUL
     UseMethod('jointCovariance')
     
   }
-
 

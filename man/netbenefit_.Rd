@@ -8,8 +8,8 @@ netbenefit_(formula, endpoints, data_index = 1)
 }
 \arguments{
 \item{formula}{a two-sided R formula \verb{<label> ~ arm}. The LHS is used
-purely as a row label in \code{pated()} output; the first RHS variable is
-the name of the column in \code{data} holding treatment-arm assignment.}
+purely as a row label in \code{pated()} output; the RHS must contain exactly
+one variable, the column in \code{data} holding treatment-arm assignment.}
 
 \item{endpoints}{a non-empty list of endpoint specs built by \code{nb_tte()},
 \code{nb_continuous()}, or \code{nb_binary()}. The order of the list encodes the

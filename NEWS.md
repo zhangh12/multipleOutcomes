@@ -1,3 +1,9 @@
+# multipleOutcomes 0.18.0
+
+* Added `winratio_()` for hierarchical log win-ratio analysis with
+  closed-form influence functions, plus `pated()` support and unit
+  tests covering the new adapter.
+
 # multipleOutcomes 0.17.1
 
 * `netbenefit_()` now treats NA in any endpoint column as "tied at that
