@@ -36,6 +36,8 @@ or
 - [`netbenefit_()`](https://zhangh12.github.io/multipleOutcomes/reference/netbenefit_.md)
   : Creating Objects of Hierarchical Net-Benefit (Win-Difference)
   Statistic
+- [`winratio_()`](https://zhangh12.github.io/multipleOutcomes/reference/winratio_.md)
+  : Creating Objects of Hierarchical Log Win-Ratio Statistic
 
 ## Net-benefit endpoints
 

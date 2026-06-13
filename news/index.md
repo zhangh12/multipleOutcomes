@@ -1,5 +1,14 @@
 # Changelog
 
+## multipleOutcomes 0.18.0
+
+- Added
+  [`winratio_()`](https://zhangh12.github.io/multipleOutcomes/reference/winratio_.md)
+  for hierarchical log win-ratio analysis with closed-form influence
+  functions, plus
+  [`pated()`](https://zhangh12.github.io/multipleOutcomes/reference/pated.md)
+  support and unit tests covering the new adapter.
+
 ## multipleOutcomes 0.17.1
 
 - [`netbenefit_()`](https://zhangh12.github.io/multipleOutcomes/reference/netbenefit_.md)

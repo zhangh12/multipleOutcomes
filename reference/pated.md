@@ -31,8 +31,10 @@ pated(
   [`gee_()`](https://zhangh12.github.io/multipleOutcomes/reference/gee_.md),
   [`mmrm_()`](https://zhangh12.github.io/multipleOutcomes/reference/mmrm_.md),
   [`km_()`](https://zhangh12.github.io/multipleOutcomes/reference/km_.md),
+  [`quantile_()`](https://zhangh12.github.io/multipleOutcomes/reference/quantile_.md),
+  [`netbenefit_()`](https://zhangh12.github.io/multipleOutcomes/reference/netbenefit_.md),
   or
-  [`quantile_()`](https://zhangh12.github.io/multipleOutcomes/reference/quantile_.md).
+  [`winratio_()`](https://zhangh12.github.io/multipleOutcomes/reference/winratio_.md).
   The first specification is the primary outcome whose treatment effect
   is being tested; the rest are prognostic covariates used to tighten
   the SE.

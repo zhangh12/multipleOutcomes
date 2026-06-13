@@ -1,9 +1,8 @@
-# Creating Objects of Hierarchical Net-Benefit (Win-Difference) Statistic
+# Creating Objects of Hierarchical Log Win-Ratio Statistic
 
-`netbenefit_` creates an object to be passed into `jointCovariance` or
+`winratio_` creates an object to be passed into `jointCovariance` or
 `pated` through its `...` argument. The object defines a hierarchical
-net-benefit (a.k.a. win-difference, proportion-in-favor) statistic
-across a list of endpoints, each declared by
+win-ratio statistic across a list of endpoints, each declared by
 [`nb_tte()`](https://zhangh12.github.io/multipleOutcomes/reference/nb_endpoint.md),
 [`nb_continuous()`](https://zhangh12.github.io/multipleOutcomes/reference/nb_endpoint.md),
 or
@@ -12,7 +11,7 @@ or
 ## Usage
 
 ``` r
-netbenefit_(formula, endpoints, data_index = 1)
+winratio_(formula, endpoints, data_index = 1)
 ```
 
 ## Arguments
@@ -43,22 +42,26 @@ netbenefit_(formula, endpoints, data_index = 1)
 
 ## Value
 
-An object of class `c("jc_spec_netbenefit", "jc_spec")`.
+An object of class `c("jc_spec_winratio", "jc_spec")`.
 
 ## Details
 
-The estimator is \$\$\widehat\Delta = \frac{N_W - N_L}{N_W + N_L +
-N_T}\$\$ where \\N_W\\, \\N_L\\, and \\N_T\\ are the numbers of
-treatment wins, losses, and overall ties across all \\n_C \times n_T\\
-pairs (control vs. treatment subject). The per-subject influence
-function is available in closed form, so both the asymptotic and the
-bootstrap paths of `jointCovariance` are supported.
+The fitted coefficient is on the log scale: \$\$\widehat\theta =
+\log(\widehat{WR}) = \log(\widehat\pi_W / \widehat\pi_L)\$\$ where
+\\\widehat\pi_W\\ and \\\widehat\pi_L\\ are the proportions of all
+control-treatment pairs where the treatment subject wins or loses,
+respectively. Tied pairs remain in the denominator of both proportions
+but do not contribute to either numerator.
+
+The raw win ratio can be recovered by exponentiating the coefficient.
+The log scale is used because it gives the standard large-sample Wald
+representation and maps the null win ratio of 1 to 0.
 
 The arm reference level is inferred from the arm column the same way
 `model.matrix(~ arm)` would: `levels(arm)[1]` for factor, the smaller
 value for numeric or logical, and the alphabetically first value for
 character. To override, convert the column to a factor with the desired
-level order before calling `netbenefit_()`.
+level order before calling `winratio_()`.
 
 ## See also
 
